@@ -11,7 +11,7 @@ import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CatalogItemDummyData {
-    public static List<CatalogItem> items;
+    public static CatalogItem[] items;
 
     private static final LocalDateTime FIXED_TIMESTAMP = LocalDateTime.of(2023, 10, 5, 12, 0);
     static {
@@ -137,6 +137,6 @@ public class CatalogItemDummyData {
         item5.setMaxStockThreshold(50);
         item5.setOnReorder(true);
         
-        items = List.of(item1, item2, item3, item4, item5);
+        items = new CatalogItem[]{item1, item2, item3, item4, item5};
     }
 }
