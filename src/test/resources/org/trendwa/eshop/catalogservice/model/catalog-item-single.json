@@ -1,0 +1,32 @@
+{
+  "id": 1,
+  "createdAt": "2023-10-05T12:00:00",
+  "createdBy": "system",
+  "updatedAt": "2023-10-05T12:00:00",
+  "updatedBy": "system",
+  "name": "Sony TV",
+  "description": "55 inch 4K TV",
+  "price": 799.99,
+  "pictureFileName": "sony_tv.jpg",
+  "pictureUri": "/images/sony_tv.jpg",
+  "catalogType": {
+    "id": 1,
+    "createdAt": "2023-10-05T12:00:00",
+    "createdBy": "system",
+    "updatedAt": "2023-10-05T12:00:00",
+    "updatedBy": "system",
+    "type": "Electronics"
+  },
+  "catalogBrand": {
+    "id": 1,
+    "createdAt": "2023-10-05T12:00:00",
+    "createdBy": "system",
+    "updatedAt": "2023-10-05T12:00:00",
+    "updatedBy": "system",
+    "brand": "Sony"
+  },
+  "availableStock": 50,
+  "restockThreshold": 10,
+  "maxStockThreshold": 100,
+  "onReorder": false
+}
