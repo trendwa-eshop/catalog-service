@@ -79,10 +79,9 @@ class CatalogItemTest {
                       "onReorder": false
                     }
                     """;
-            assertThat(json.parse(expected))
+            assertThat(json.parseObject(expected))
                     .isEqualTo(catalogItems[0]);
         }
-
 
         @Test
         @DisplayName("Test serialization of a list of catalog items")
@@ -258,7 +257,7 @@ class CatalogItemTest {
                     ]
                     """;
 
-            assertThat(jsonList.parse(expected)).isEqualTo(catalogItems);
+            assertThat(jsonList.parseObject(expected)).isEqualTo(catalogItems);
         }
     }
 
