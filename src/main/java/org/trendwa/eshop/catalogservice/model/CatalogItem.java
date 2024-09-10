@@ -6,6 +6,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.trendwa.eshop.catalogservice.exception.domain.CatalogDomainException;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -30,4 +31,19 @@ public class CatalogItem extends ApplicationEntity {
     private int restockThreshold;
     private int maxStockThreshold;
     private boolean onReorder;
+
+    public int removeStock(int quantityDesired){
+        if(this.availableStock == 0){
+            throw new CatalogDomainException("No available stock for item " + this.name);
+        }
+        if ( quantityDesired <= 0){
+            throw new CatalogDomainException("Item units desired must be greater than 0");
+        }
+
+        int removed = Math.min(quantityDesired, this.availableStock);
+        this.availableStock -= removed;
+
+        return removed;
+
+    }
 }
