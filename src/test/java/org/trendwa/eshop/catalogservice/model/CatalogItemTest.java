@@ -1,19 +1,21 @@
 package org.trendwa.eshop.catalogservice.model;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.trendwa.eshop.catalogservice.dummydata.CatalogItemDummyData;
-import org.trendwa.eshop.catalogservice.model.CatalogItem;
+import org.trendwa.eshop.catalogservice.exception.domain.CatalogDomainException;
+
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 @JsonTest
+@DisplayName("Catalog Item Tests")
+@TestClassOrder(ClassOrderer.OrderAnnotation.class)
 class CatalogItemTest {
 
     @Autowired
@@ -22,17 +24,17 @@ class CatalogItemTest {
     @Autowired
     private JacksonTester<CatalogItem[]> jsonList;
 
-
     private CatalogItem[] catalogItems;
 
     @BeforeEach
     void setUp() {
-        catalogItems = CatalogItemDummyData.items;
+        catalogItems = CatalogItemDummyData.items.clone();
     }
 
     @Nested
-    @DisplayName("Tests for a single catalog item")
-    class SingleCatalogItemTests{
+    @DisplayName("Json serialization tests")
+    class JsonSerializationTests {
+
         @Test
         @DisplayName("Test serialization of a single catalog item")
         void catalogItemSerializationTest() throws IOException {
@@ -44,49 +46,42 @@ class CatalogItemTest {
         @DisplayName("Test deserialization of a single catalog item")
         void catalogItemDeserializationTest() throws IOException {
             String expected = """
-                {
-                  "id": 1,
-                  "createdAt": "2023-10-05T12:00:00",
-                  "createdBy": "system",
-                  "updatedAt": "2023-10-05T12:00:00",
-                  "updatedBy": "system",
-                  "name": "Sony TV",
-                  "description": "55 inch 4K TV",
-                  "price": 799.99,
-                  "pictureFileName": "sony_tv.jpg",
-                  "pictureUri": "/images/sony_tv.jpg",
-                  "catalogType": {
-                    "id": 1,
-                    "createdAt": "2023-10-05T12:00:00",
-                    "createdBy": "system",
-                    "updatedAt": "2023-10-05T12:00:00",
-                    "updatedBy": "system",
-                    "type": "Electronics"
-                  },
-                  "catalogBrand": {
-                    "id": 1,
-                    "createdAt": "2023-10-05T12:00:00",
-                    "createdBy": "system",
-                    "updatedAt": "2023-10-05T12:00:00",
-                    "updatedBy": "system",
-                    "brand": "Sony"
-                  },
-                  "availableStock": 50,
-                  "restockThreshold": 10,
-                  "maxStockThreshold": 100,
-                  "onReorder": false
-                }
-                """;
-            assertThat(json.parse(expected))
+                    {
+                      "id": 1,
+                      "createdAt": "2023-10-05T12:00:00",
+                      "createdBy": "system",
+                      "updatedAt": "2023-10-05T12:00:00",
+                      "updatedBy": "system",
+                      "name": "Sony TV",
+                      "description": "55 inch 4K TV",
+                      "price": 799.99,
+                      "pictureFileName": "sony_tv.jpg",
+                      "pictureUri": "/images/sony_tv.jpg",
+                      "catalogType": {
+                        "id": 1,
+                        "createdAt": "2023-10-05T12:00:00",
+                        "createdBy": "system",
+                        "updatedAt": "2023-10-05T12:00:00",
+                        "updatedBy": "system",
+                        "type": "Electronics"
+                      },
+                      "catalogBrand": {
+                        "id": 1,
+                        "createdAt": "2023-10-05T12:00:00",
+                        "createdBy": "system",
+                        "updatedAt": "2023-10-05T12:00:00",
+                        "updatedBy": "system",
+                        "brand": "Sony"
+                      },
+                      "availableStock": 50,
+                      "restockThreshold": 10,
+                      "maxStockThreshold": 100,
+                      "onReorder": false
+                    }
+                    """;
+            assertThat(json.parseObject(expected))
                     .isEqualTo(catalogItems[0]);
         }
-
-    }
-
-
-    @Nested
-    @DisplayName("Tests for a list of catalog items")
-    class CatalogItemListTests{
 
         @Test
         @DisplayName("Test serialization of a list of catalog items")
@@ -262,13 +257,62 @@ class CatalogItemTest {
                     ]
                     """;
 
-            assertThat(jsonList.parse(expected)).isEqualTo(catalogItems);
+            assertThat(jsonList.parseObject(expected)).isEqualTo(catalogItems);
+        }
+    }
+
+
+    @Nested
+    @DisplayName("Function tests")
+    class FunctionTests {
+
+        /*
+         * Tests the decrementing of item quantity in inventory.
+         *
+         * This test verifies that:
+         * 1. When there is sufficient stock, the quantity removed matches the desired quantity.
+         * 2. When stock is insufficient, the method removes the available stock and returns the
+         *    amount removed.
+         * 3. A negative quantity request is invalid and should throw an IllegalArgumentException.
+         */
+
+        @Test
+        @DisplayName("Test Remove Stock")
+        void testRemoveStock() {
+            CatalogItem catalogItem = createCatalogItem();
+
+            // Test negative quantity removal
+            CatalogDomainException exception = assertThrows(CatalogDomainException.class, () -> {
+                catalogItem.removeStock(-10);
+            });
+            assertThat(exception.getMessage()).isEqualTo("Item units desired must be greater than 0");
+
+            // Test valid stock removal
+            int removedStock = catalogItem.removeStock(10);
+            assertThat(removedStock).isEqualTo(10);
+            assertThat(catalogItem.getAvailableStock()).isEqualTo(40);
+
+            // Test removal more than available stock
+            removedStock = catalogItem.removeStock(50);
+            assertThat(removedStock).isEqualTo(40);
+            assertThat(catalogItem.getAvailableStock()).isZero();
         }
 
     }
 
-
-
-
+    private CatalogItem createCatalogItem() {
+        CatalogItem catalogItem = new CatalogItem();
+        catalogItem.setId(1L);
+        catalogItem.setName("Sony TV");
+        catalogItem.setDescription("55 inch 4K TV");
+        catalogItem.setPrice(799.99);
+        catalogItem.setPictureFileName("sony_tv.jpg");
+        catalogItem.setPictureUri("/images/sony_tv.jpg");
+        catalogItem.setAvailableStock(50);
+        catalogItem.setRestockThreshold(10);
+        catalogItem.setMaxStockThreshold(100);
+        catalogItem.setOnReorder(false);
+        return catalogItem;
+    }
 
 }
