@@ -6,6 +6,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.trendwa.eshop.catalogservice.exception.development.NotImplementedException;
 import org.trendwa.eshop.catalogservice.exception.domain.CatalogDomainException;
 
 @EqualsAndHashCode(callSuper = true)
@@ -49,6 +50,6 @@ public class CatalogItem extends ApplicationEntity {
 
     public int addStock(int quantityDesired){
         // TODO: implement this method.
-        return 0;
+        throw new NotImplementedException();
     }
 }
