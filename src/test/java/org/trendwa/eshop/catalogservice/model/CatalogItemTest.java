@@ -298,6 +298,80 @@ class CatalogItemTest {
             assertThat(catalogItem.getAvailableStock()).isZero();
         }
 
+
+
+        @Nested
+        @DisplayName("Add Stock Tests")
+        class AddStockTests {
+            /*
+             * Tests the incrementing of item quantity in inventory.
+             *
+             * These test verifies that:
+             * 1. When the quantity to add is positive, the stock is increased by the desired quantity.
+             * 2. When the quantity to add is negative, the method throws an CatalogDomainException.
+             * 3. When the quantity to add is zero, the method does not change the stock.
+             * 4. When the quantity to add is greater than the max stock threshold, the method adds the stock up to the max threshold.
+             * 5. When max stock threshold is reached, the method does not add any stock.
+             * 6. When the stock is added, the onReorder flag is set to false.
+             * 7. The method returns the amount of stock added.
+             */
+
+            @Test
+            @DisplayName("When the quantity to add is positive, the stock should be increased by the desired quantity")
+            void testAddStockPositive() {
+                CatalogItem catalogItem = createCatalogItem();
+                int addedStock = catalogItem.addStock(10);
+                assertThat(addedStock).isEqualTo(10);
+                assertThat(catalogItem.getAvailableStock()).isEqualTo(60);
+            }
+
+            @Test
+            @DisplayName("When the quantity to add is negative, the method should throw an CatalogDomainException")
+            void testAddStockNegative() {
+                CatalogItem catalogItem = createCatalogItem();
+                CatalogDomainException exception = assertThrows(CatalogDomainException.class, () -> {
+                    catalogItem.addStock(-10);
+                });
+                assertThat(exception.getMessage()).isEqualTo("Item units desired must be greater than 0");
+            }
+
+            @Test
+            @DisplayName("When the quantity to add is zero, the method should not change the stock")
+            void testAddStockZero() {
+                CatalogItem catalogItem = createCatalogItem();
+                int addedStock = catalogItem.addStock(0);
+                assertThat(addedStock).isZero();
+                assertThat(catalogItem.getAvailableStock()).isEqualTo(50);
+            }
+
+            @Test
+            @DisplayName("When the quantity to add is greater than the max stock threshold, the method should add the stock up to the max threshold")
+            void testAddStockMaxThreshold() {
+                CatalogItem catalogItem = createCatalogItem();
+                int addedStock = catalogItem.addStock(100);
+                assertThat(addedStock).isEqualTo(50);
+                assertThat(catalogItem.getAvailableStock()).isEqualTo(100);
+            }
+
+            @Test
+            @DisplayName("When max stock threshold is reached, the method should not add any stock")
+            void testAddStockMaxThresholdReached() {
+                CatalogItem catalogItem = createCatalogItem();
+                catalogItem.addStock(100);
+                int addedStock = catalogItem.addStock(10);
+                assertThat(addedStock).isZero();
+                assertThat(catalogItem.getAvailableStock()).isEqualTo(100);
+            }
+
+            @Test
+            @DisplayName("When the stock is added, the onReorder flag should be set to false")
+            void testAddStockOnReorder() {
+                CatalogItem catalogItem = createCatalogItem();
+                catalogItem.setOnReorder(true);
+                catalogItem.addStock(10);
+                assertThat(catalogItem.isOnReorder()).isFalse();
+            }
+        }
     }
 
     private CatalogItem createCatalogItem() {

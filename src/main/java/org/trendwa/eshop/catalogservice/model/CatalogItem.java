@@ -46,4 +46,9 @@ public class CatalogItem extends ApplicationEntity {
         return removed;
 
     }
+
+    public int addStock(int quantityDesired){
+        // TODO: implement this method.
+        return 0;
+    }
 }
