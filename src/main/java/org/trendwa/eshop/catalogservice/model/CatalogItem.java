@@ -1,8 +1,6 @@
 package org.trendwa.eshop.catalogservice.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -12,26 +10,47 @@ import org.trendwa.eshop.catalogservice.exception.domain.CatalogDomainException;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "catalog_items")
+@Table(name = "catalog_items", indexes = {
+        @Index(name = "idx_catalog_items_name", columnList = "name"),
+})
 public class CatalogItem extends ApplicationEntity {
 
+    @Column(nullable = false, name = "name")
     private String name;
+
+    @Column(name = "description")
     private String description;
+
+    @Column(name = "price")
     private double price;
+
+    @Column(name = "picture_file_name")
     private String pictureFileName;
+
+    @Column(name = "picture_uri")
     private String pictureUri;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinColumn(name = "catalog_type_id")
     private CatalogType catalogType;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinColumn(name = "catalog_brand_id")
     private CatalogBrand catalogBrand;
 
+    @Column(name = "available_stock")
     private int availableStock;
-    private int restockThreshold;
-    private int maxStockThreshold;
-    private boolean onReorder;
 
+    @Column(name = "restock_threshold")
+    private int restockThreshold;
+
+    @Column(name = "max_stock_threshold")
+    private int maxStockThreshold;
+
+    @Column(name = "on_reorder")
+    private boolean onReorder;
 
     /**
      * Removes stock from the catalog item.
