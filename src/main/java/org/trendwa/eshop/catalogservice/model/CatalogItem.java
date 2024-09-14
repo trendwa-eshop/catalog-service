@@ -32,11 +32,19 @@ public class CatalogItem extends ApplicationEntity {
     private int maxStockThreshold;
     private boolean onReorder;
 
-    public int removeStock(int quantityDesired){
-        if(this.availableStock == 0){
+
+    /**
+     * Removes stock from the catalog item.
+     *
+     * @param quantityDesired the number of units to remove from the stock
+     * @return the number of units actually removed from the stock
+     * @throws CatalogDomainException if the quantity desired is less than 0 or if there is no available stock
+     */
+    public int removeStock(int quantityDesired) {
+        if (this.availableStock == 0) {
             throw new CatalogDomainException("No available stock for item " + this.name);
         }
-        if ( quantityDesired <= 0){
+        if (quantityDesired <= 0) {
             throw new CatalogDomainException("Item units desired must be greater than 0");
         }
 
@@ -45,5 +53,29 @@ public class CatalogItem extends ApplicationEntity {
 
         return removed;
 
+    }
+
+    /**
+     * Adds stock to the catalog item.
+     *
+     * @param quantityDesired the number of units to add to the stock
+     * @return the number of units actually added to the stock
+     * @throws CatalogDomainException if the quantity desired is less than 0
+     */
+    public int addStock(int quantityDesired) {
+        if (quantityDesired < 0) {
+            throw new CatalogDomainException("Item units desired must be greater than 0");
+        }
+
+        int originalStock = this.availableStock;
+        this.availableStock = Math.min(this.availableStock + quantityDesired, this.maxStockThreshold);
+
+        int addedStock = this.availableStock - originalStock;
+
+        if (addedStock > 0) {
+            this.onReorder = false;
+        }
+
+        return addedStock;
     }
 }
