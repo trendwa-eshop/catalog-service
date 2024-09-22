@@ -15,7 +15,7 @@
     "createdBy": "system",
     "updatedAt": "2023-10-05T12:00:00",
     "updatedBy": "system",
-    "type": "Electronics"
+    "name": "Electronics"
   },
   "catalogBrand": {
     "id": 1,
@@ -23,7 +23,7 @@
     "createdBy": "system",
     "updatedAt": "2023-10-05T12:00:00",
     "updatedBy": "system",
-    "brand": "Sony"
+    "name": "Sony"
   },
   "availableStock": 50,
   "restockThreshold": 10,

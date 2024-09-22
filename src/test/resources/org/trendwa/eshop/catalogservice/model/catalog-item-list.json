@@ -16,7 +16,7 @@
       "createdBy": "system",
       "updatedAt": "2023-10-05T12:00:00",
       "updatedBy": "system",
-      "type": "Electronics"
+      "name": "Electronics"
     },
     "catalogBrand": {
       "id": 1,
@@ -24,7 +24,7 @@
       "createdBy": "system",
       "updatedAt": "2023-10-05T12:00:00",
       "updatedBy": "system",
-      "brand": "Sony"
+      "name": "Sony"
     },
     "availableStock": 50,
     "restockThreshold": 10,
@@ -48,7 +48,7 @@
       "createdBy": "system",
       "updatedAt": "2023-10-05T12:00:00",
       "updatedBy": "system",
-      "type": "Clothing"
+      "name": "Clothing"
     },
     "catalogBrand": {
       "id": 2,
@@ -56,7 +56,7 @@
       "createdBy": "system",
       "updatedAt": "2023-10-05T12:00:00",
       "updatedBy": "system",
-      "brand": "Nike"
+      "name": "Nike"
     },
     "availableStock": 200,
     "restockThreshold": 20,
@@ -80,7 +80,7 @@
       "createdBy": "system",
       "updatedAt": "2023-10-05T12:00:00",
       "updatedBy": "system",
-      "type": "Electronics"
+      "name": "Electronics"
     },
     "catalogBrand": {
       "id": 1,
@@ -88,7 +88,7 @@
       "createdBy": "system",
       "updatedAt": "2023-10-05T12:00:00",
       "updatedBy": "system",
-      "brand": "Sony"
+      "name": "Sony"
     },
     "availableStock": 150,
     "restockThreshold": 15,
@@ -112,7 +112,7 @@
       "createdBy": "system",
       "updatedAt": "2023-10-05T12:00:00",
       "updatedBy": "system",
-      "type": "Clothing"
+      "name": "Clothing"
     },
     "catalogBrand": {
       "id": 2,
@@ -120,7 +120,7 @@
       "createdBy": "system",
       "updatedAt": "2023-10-05T12:00:00",
       "updatedBy": "system",
-      "brand": "Nike"
+      "name": "Nike"
     },
     "availableStock": 300,
     "restockThreshold": 30,
@@ -144,7 +144,7 @@
       "createdBy": "system",
       "updatedAt": "2023-10-05T12:00:00",
       "updatedBy": "system",
-      "type": "Electronics"
+      "name": "Electronics"
     },
     "catalogBrand": {
       "id": 1,
@@ -152,7 +152,7 @@
       "createdBy": "system",
       "updatedAt": "2023-10-05T12:00:00",
       "updatedBy": "system",
-      "brand": "Sony"
+      "name": "Sony"
     },
     "availableStock": 30,
     "restockThreshold": 5,
