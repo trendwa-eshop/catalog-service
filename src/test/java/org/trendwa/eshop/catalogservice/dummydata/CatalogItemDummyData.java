@@ -7,7 +7,6 @@ import org.trendwa.eshop.catalogservice.model.CatalogItem;
 import org.trendwa.eshop.catalogservice.model.CatalogType;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CatalogItemDummyData {
@@ -21,7 +20,7 @@ public class CatalogItemDummyData {
         electronicsType.setCreatedBy("system");
         electronicsType.setUpdatedAt(FIXED_TIMESTAMP);
         electronicsType.setUpdatedBy("system");
-        electronicsType.setType("Electronics");
+        electronicsType.setName("Electronics");
 
         CatalogType clothingType = new CatalogType();
         clothingType.setId(2L);
@@ -29,7 +28,7 @@ public class CatalogItemDummyData {
         clothingType.setCreatedBy("system");
         clothingType.setUpdatedAt(FIXED_TIMESTAMP);
         clothingType.setUpdatedBy("system");
-        clothingType.setType("Clothing");
+        clothingType.setName("Clothing");
 
         CatalogBrand sonyBrand = new CatalogBrand();
         sonyBrand.setId(1L);
@@ -37,7 +36,7 @@ public class CatalogItemDummyData {
         sonyBrand.setCreatedBy("system");
         sonyBrand.setUpdatedAt(FIXED_TIMESTAMP);
         sonyBrand.setUpdatedBy("system");
-        sonyBrand.setBrand("Sony");
+        sonyBrand.setName("Sony");
 
         CatalogBrand nikeBrand = new CatalogBrand();
         nikeBrand.setId(2L);
@@ -45,7 +44,7 @@ public class CatalogItemDummyData {
         nikeBrand.setCreatedBy("system");
         nikeBrand.setUpdatedAt(FIXED_TIMESTAMP);
         nikeBrand.setUpdatedBy("system");
-        nikeBrand.setBrand("Nike");
+        nikeBrand.setName("Nike");
 
         CatalogItem item1 = new CatalogItem();
         item1.setId(1L);

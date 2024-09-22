@@ -28,11 +28,12 @@ class CatalogItemTest {
 
     @BeforeEach
     void setUp() {
-        catalogItems = CatalogItemDummyData.items.clone();
+        catalogItems = CatalogItemDummyData.items;
     }
 
     @Nested
     @DisplayName("Json serialization tests")
+    @Order(1)
     class JsonSerializationTests {
 
         @Test
@@ -63,7 +64,7 @@ class CatalogItemTest {
                         "createdBy": "system",
                         "updatedAt": "2023-10-05T12:00:00",
                         "updatedBy": "system",
-                        "type": "Electronics"
+                        "name": "Electronics"
                       },
                       "catalogBrand": {
                         "id": 1,
@@ -71,7 +72,7 @@ class CatalogItemTest {
                         "createdBy": "system",
                         "updatedAt": "2023-10-05T12:00:00",
                         "updatedBy": "system",
-                        "brand": "Sony"
+                        "name": "Sony"
                       },
                       "availableStock": 50,
                       "restockThreshold": 10,
@@ -111,7 +112,7 @@ class CatalogItemTest {
                           "createdBy": "system",
                           "updatedAt": "2023-10-05T12:00:00",
                           "updatedBy": "system",
-                          "type": "Electronics"
+                          "name": "Electronics"
                         },
                         "catalogBrand": {
                           "id": 1,
@@ -119,7 +120,7 @@ class CatalogItemTest {
                           "createdBy": "system",
                           "updatedAt": "2023-10-05T12:00:00",
                           "updatedBy": "system",
-                          "brand": "Sony"
+                          "name": "Sony"
                         },
                         "availableStock": 50,
                         "restockThreshold": 10,
@@ -143,7 +144,7 @@ class CatalogItemTest {
                           "createdBy": "system",
                           "updatedAt": "2023-10-05T12:00:00",
                           "updatedBy": "system",
-                          "type": "Clothing"
+                          "name": "Clothing"
                         },
                         "catalogBrand": {
                           "id": 2,
@@ -151,7 +152,7 @@ class CatalogItemTest {
                           "createdBy": "system",
                           "updatedAt": "2023-10-05T12:00:00",
                           "updatedBy": "system",
-                          "brand": "Nike"
+                          "name": "Nike"
                         },
                         "availableStock": 200,
                         "restockThreshold": 20,
@@ -175,7 +176,7 @@ class CatalogItemTest {
                           "createdBy": "system",
                           "updatedAt": "2023-10-05T12:00:00",
                           "updatedBy": "system",
-                          "type": "Electronics"
+                          "name": "Electronics"
                         },
                         "catalogBrand": {
                           "id": 1,
@@ -183,7 +184,7 @@ class CatalogItemTest {
                           "createdBy": "system",
                           "updatedAt": "2023-10-05T12:00:00",
                           "updatedBy": "system",
-                          "brand": "Sony"
+                          "name": "Sony"
                         },
                         "availableStock": 150,
                         "restockThreshold": 15,
@@ -207,7 +208,7 @@ class CatalogItemTest {
                           "createdBy": "system",
                           "updatedAt": "2023-10-05T12:00:00",
                           "updatedBy": "system",
-                          "type": "Clothing"
+                          "name": "Clothing"
                         },
                         "catalogBrand": {
                           "id": 2,
@@ -215,7 +216,7 @@ class CatalogItemTest {
                           "createdBy": "system",
                           "updatedAt": "2023-10-05T12:00:00",
                           "updatedBy": "system",
-                          "brand": "Nike"
+                          "name": "Nike"
                         },
                         "availableStock": 300,
                         "restockThreshold": 30,
@@ -239,7 +240,7 @@ class CatalogItemTest {
                           "createdBy": "system",
                           "updatedAt": "2023-10-05T12:00:00",
                           "updatedBy": "system",
-                          "type": "Electronics"
+                          "name": "Electronics"
                         },
                         "catalogBrand": {
                           "id": 1,
@@ -247,7 +248,7 @@ class CatalogItemTest {
                           "createdBy": "system",
                           "updatedAt": "2023-10-05T12:00:00",
                           "updatedBy": "system",
-                          "brand": "Sony"
+                          "name": "Sony"
                         },
                         "availableStock": 30,
                         "restockThreshold": 5,
@@ -262,9 +263,9 @@ class CatalogItemTest {
     }
 
 
-
     @Nested
     @DisplayName("Function tests")
+    @Order(2)
     class FunctionTests {
 
 
@@ -304,9 +305,9 @@ class CatalogItemTest {
             @DisplayName("A negative quantity request is invalid and should throw an IllegalArgumentException")
             void testRemoveStockNegativeQuantity() {
                 CatalogItem catalogItem = createCatalogItem();
-                CatalogDomainException exception = assertThrows(CatalogDomainException.class, () -> {
-                    catalogItem.removeStock(-10);
-                });
+                CatalogDomainException exception = assertThrows(CatalogDomainException.class, () ->
+                        catalogItem.removeStock(-10)
+                );
                 assertThat(exception.getMessage()).isEqualTo("Item units desired must be greater than 0");
             }
 
@@ -315,9 +316,9 @@ class CatalogItemTest {
             void testRemoveStockNoStock() {
                 CatalogItem catalogItem = createCatalogItem();
                 catalogItem.removeStock(50);
-                CatalogDomainException exception = assertThrows(CatalogDomainException.class, () -> {
-                    catalogItem.removeStock(10);
-                });
+                CatalogDomainException exception = assertThrows(CatalogDomainException.class, () ->
+                        catalogItem.removeStock(10)
+                );
                 assertThat(exception.getMessage()).isEqualTo("No available stock for item " + catalogItem.getName());
             }
         }
@@ -353,9 +354,9 @@ class CatalogItemTest {
             @DisplayName("When the quantity to add is negative, the method should throw an CatalogDomainException")
             void testAddStockNegative() {
                 CatalogItem catalogItem = createCatalogItem();
-                CatalogDomainException exception = assertThrows(CatalogDomainException.class, () -> {
-                    catalogItem.addStock(-10);
-                });
+                CatalogDomainException exception = assertThrows(CatalogDomainException.class, () ->
+                        catalogItem.addStock(-10)
+                );
                 assertThat(exception.getMessage()).isEqualTo("Item units desired must be greater than 0");
             }
 
