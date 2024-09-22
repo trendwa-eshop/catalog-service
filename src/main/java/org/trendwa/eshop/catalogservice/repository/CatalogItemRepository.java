@@ -8,6 +8,7 @@ import java.util.List;
 /**
  * Repository interface for CatalogItem entities.
  * Extends JpaRepository to provide CRUD operations and custom query methods.
+ * @author Musa Beytekin
  */
 public interface CatalogItemRepository extends JpaRepository<CatalogItem, Long> {
 
