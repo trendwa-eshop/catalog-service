@@ -10,7 +10,7 @@ import org.trendwa.eshop.catalogservice.exception.domain.CatalogDomainException;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "catalog_items", indexes = {
+@Table(name = "catalog_item", indexes = {
         @Index(name = "idx_catalog_items_name", columnList = "name"),
 })
 public class CatalogItem extends ApplicationEntity {
@@ -30,12 +30,12 @@ public class CatalogItem extends ApplicationEntity {
     @Column(name = "picture_uri")
     private String pictureUri;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+    @ManyToOne(cascade = {
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "catalog_type_id")
     private CatalogType catalogType;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+    @ManyToOne(cascade = {
             CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "catalog_brand_id")
     private CatalogBrand catalogBrand;
