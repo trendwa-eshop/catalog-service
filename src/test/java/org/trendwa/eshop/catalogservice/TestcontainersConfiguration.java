@@ -7,6 +7,8 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 
+import java.util.List;
+
 @TestConfiguration(proxyBeanMethods = false)
 public class TestcontainersConfiguration {
 
@@ -18,8 +20,9 @@ public class TestcontainersConfiguration {
                 .withDatabaseName("catalog")
                 .withUsername("root")
                 .withPassword("root")
-                .withReuse(true);
+                        .withReuse(true);
 
+        MYSQL_CONTAINER.setPortBindings(List.of("61636:3306"));
         org.testcontainers.utility.TestcontainersConfiguration.getInstance()
                 .updateUserConfig("testcontainers.reuse.enable", "true");
         MYSQL_CONTAINER.start();
