@@ -1,7 +1,14 @@
--- src/main/resources/db/migration/V4__insert_catalog_item.sql
+INSERT INTO catalog_brand (CREATED_AT, CREATED_BY, UPDATED_AT, UPDATED_BY, name)
+VALUES ('2023-01-01 10:00:00', 'admin', '2023-01-01 10:00:00', 'admin', 'Nike'),
+       ('2023-01-01 10:00:00', 'admin', '2023-01-01 10:00:00', 'admin', 'Adidas');
+
+INSERT INTO catalog_type (CREATED_AT, CREATED_BY, UPDATED_AT, UPDATED_BY, name)
+VALUES ('2023-01-01 10:00:00', 'admin', '2023-01-01 10:00:00', 'admin', 'Shoes'),
+       ('2023-01-01 10:00:00', 'admin', '2023-01-01 10:00:00', 'admin', 'Apparel');
+
 INSERT INTO catalog_item (CREATED_AT, CREATED_BY, UPDATED_AT, UPDATED_BY, name, description, price, picture_file_name,
-                           picture_uri, catalog_type_id, catalog_brand_id, available_stock, restock_threshold,
-                           max_stock_threshold, on_reorder)
+                          picture_uri, catalog_type_id, catalog_brand_id, available_stock, restock_threshold,
+                          max_stock_threshold, on_reorder)
 VALUES ('2023-01-01 10:00:00', 'admin', '2023-01-01 10:00:00', 'admin', 'Air Max 90', 'Classic Nike running shoes',
         120.00, 'airmax90.jpg', 'http://example.com/airmax90.jpg', 1, 1, 50, 5, 100, false),
        ('2023-01-01 10:00:00', 'admin', '2023-01-01 10:00:00', 'admin', 'Ultraboost', 'High-performance Adidas running shoes', 180.00, 'ultraboost.jpg', 'http://example.com/ultraboost.jpg', 1, 2, 30, 3, 80, true),

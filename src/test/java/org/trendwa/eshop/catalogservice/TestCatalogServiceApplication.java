@@ -1,7 +1,9 @@
 package org.trendwa.eshop.catalogservice;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.test.context.TestPropertySource;
 
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class TestCatalogServiceApplication {
 
     public static void main(String[] args) {

@@ -3,22 +3,20 @@ package org.trendwa.eshop.catalogservice.controller;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestContextManager;
 import org.springframework.test.context.TestPropertySource;
 import org.trendwa.eshop.catalogservice.TestcontainersConfiguration;
 import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogTypeDto;
+import org.trendwa.eshop.catalogservice.util.AppTestUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,13 +26,28 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestcontainersConfiguration.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@TestPropertySource(locations = "classpath:test.properties")
+@TestPropertySource(locations = "classpath:application-test.properties")
 @Transactional
 @DisplayName("Catalog Item Controller Tests")
+
 class CatalogItemControllerTests {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    private final TestContextManager testContextManager = new TestContextManager(getClass());
+
+    @BeforeEach
+    void beforeEach() throws Exception {
+        testContextManager.prepareTestInstance(this);
+        AppTestUtils.insertSimpleData(testContextManager.getTestContext());
+    }
+
+    @AfterEach
+    void afterEach() throws Exception {
+        testContextManager.prepareTestInstance(this);
+        AppTestUtils.resetDatabase(testContextManager.getTestContext());
+    }
 
     @Test
     @DisplayName("Should return all items with pagination")
@@ -62,12 +75,16 @@ class CatalogItemControllerTests {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
 
+
         DocumentContext jsonContext = JsonPath.parse(response.getBody());
         int itemCount = jsonContext.read("$.length()");
 
         assertEquals(requestedIds.size(), itemCount);
 
-        List<Long> returnedIds = jsonContext.read("$[*].id");
+        List<Integer> numberList = jsonContext.read("$[*].id", List.class);
+        List<Long> returnedIds = numberList.stream()
+                .map(Number::longValue)
+                .collect(Collectors.toList());
         assertEquals(requestedIds, returnedIds);
     }
 
@@ -82,7 +99,6 @@ class CatalogItemControllerTests {
     @Test
     @DisplayName("Should return items by name containing with pagination")
     void shouldReturnItemsByNameContaining() {
-        Pageable pageable = PageRequest.of(0, 10);
         ResponseEntity<String> response = restTemplate.getForEntity("/items/by/Air?page=0&size=10", String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -130,8 +146,8 @@ class CatalogItemControllerTests {
                 200.0,
                 "updated.jpg",
                 "uri/updated.jpg",
-                new CatalogTypeDto(2L, "Updated Type"),
-                new CatalogBrandDto(2L, "Updated Brand"),
+                new CatalogTypeDto(2L),
+                new CatalogBrandDto(2L),
                 20,
                 10,
                 30,
@@ -191,9 +207,7 @@ class CatalogItemControllerTests {
         assertEquals(expected.pictureFileName(), actual.pictureFileName());
         assertEquals(expected.pictureUri(), actual.pictureUri());
         assertEquals(expected.catalogType().id(), actual.catalogType().id());
-        assertEquals(expected.catalogType().name(), actual.catalogType().name());
         assertEquals(expected.catalogBrand().id(), actual.catalogBrand().id());
-        assertEquals(expected.catalogBrand().name(), actual.catalogBrand().name());
         assertEquals(expected.availableStock(), actual.availableStock());
         assertEquals(expected.restockThreshold(), actual.restockThreshold());
         assertEquals(expected.maxStockThreshold(), actual.maxStockThreshold());

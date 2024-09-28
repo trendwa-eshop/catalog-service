@@ -1,14 +1,13 @@
 package org.trendwa.eshop.catalogservice.service;
 
 import org.hibernate.exception.ConstraintViolationException;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.context.TestContextManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.trendwa.eshop.catalogservice.TestcontainersConfiguration;
@@ -16,6 +15,7 @@ import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogTypeDto;
 import org.trendwa.eshop.catalogservice.exception.CatalogItemNotFoundException;
+import org.trendwa.eshop.catalogservice.util.AppTestUtils;
 
 import java.util.List;
 
@@ -29,6 +29,20 @@ class CatalogServiceTests {
 
     @Autowired
     private CatalogService catalogService;
+
+    private final TestContextManager testContextManager = new TestContextManager(getClass());
+
+    @BeforeAll
+    void beforeAll() throws Exception {
+        testContextManager.prepareTestInstance(this);
+        AppTestUtils.insertSimpleData(testContextManager.getTestContext());
+    }
+
+    @AfterAll
+    void afterAll() throws Exception {
+        testContextManager.prepareTestInstance(this);
+        AppTestUtils.resetDatabase(testContextManager.getTestContext());
+    }
 
     @Test
     @DisplayName("Should return all items with pagination")
