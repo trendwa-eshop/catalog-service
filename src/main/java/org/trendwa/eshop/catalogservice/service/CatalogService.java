@@ -2,6 +2,7 @@ package org.trendwa.eshop.catalogservice.service;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
 
 import java.util.List;
@@ -84,5 +85,8 @@ public interface CatalogService {
      *
      * @param id the ID of the catalog item to delete
      */
+    @Transactional
     void deleteById(Long id);
+
+
 }

@@ -1,10 +1,12 @@
 package org.trendwa.eshop.catalogservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
 import org.trendwa.eshop.catalogservice.exception.CatalogItemNotFoundException;
 import org.trendwa.eshop.catalogservice.mapper.CatalogItemMapper;
@@ -66,8 +68,9 @@ public class CatalogServiceImpl implements CatalogService{
     }
 
     @Override
-    public CatalogItemDto save(CatalogItemDto item) {
-        CatalogItem catalogItem = catalogItemRepository.save(CatalogItemMapper.mapToEntity(item));
+    @Transactional
+    public CatalogItemDto save(CatalogItemDto item) throws DataIntegrityViolationException {
+        CatalogItem catalogItem = catalogItemRepository.saveAndFlush(CatalogItemMapper.mapToEntity(item));
         return CatalogItemMapper.mapToDto(catalogItem);
     }
 

@@ -24,10 +24,10 @@ public class CatalogItem extends ApplicationEntity {
     @Column(name = "price")
     private double price;
 
-    @Column(name = "picture_file_name")
+    @Column(name = "picture_file_name", unique = true)
     private String pictureFileName;
 
-    @Column(name = "picture_uri")
+    @Column(name = "picture_uri", unique = true)
     private String pictureUri;
 
     @ManyToOne(cascade = {

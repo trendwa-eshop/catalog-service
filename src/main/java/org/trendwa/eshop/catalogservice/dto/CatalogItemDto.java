@@ -4,7 +4,7 @@ public record CatalogItemDto(
         Long id,
         String name,
         String description,
-        double price,
+        Double price,
         String pictureFileName,
         String pictureUri,
         CatalogTypeDto catalogType,
