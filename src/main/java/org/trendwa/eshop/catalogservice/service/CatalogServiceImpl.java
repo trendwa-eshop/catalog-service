@@ -70,7 +70,7 @@ public class CatalogServiceImpl implements CatalogService{
     @Override
     @Transactional
     public CatalogItemDto save(CatalogItemDto item) throws DataIntegrityViolationException {
-        CatalogItem catalogItem = catalogItemRepository.saveAndFlush(CatalogItemMapper.mapToEntity(item));
+        CatalogItem catalogItem = catalogItemRepository.save(CatalogItemMapper.mapToEntity(item));
         return CatalogItemMapper.mapToDto(catalogItem);
     }
 
@@ -81,6 +81,11 @@ public class CatalogServiceImpl implements CatalogService{
             return;
         }
         throw new CatalogItemNotFoundException("Catalog item not found with id: " + id);
+    }
+
+    @Override
+    public void flush() {
+        catalogItemRepository.flush();
     }
 
 }
