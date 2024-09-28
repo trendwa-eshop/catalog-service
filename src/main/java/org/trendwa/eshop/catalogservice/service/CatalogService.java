@@ -87,4 +87,10 @@ public interface CatalogService {
     void deleteById(Long id);
 
 
+    /**
+     * Flushes the entity manager.
+     */
+    void flush();
+
+
 }

@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.trendwa.eshop.catalogservice.TestcontainersConfiguration;
 import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
@@ -23,12 +24,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 class CatalogServiceTests {
 
     @Autowired
     private CatalogService catalogService;
-
 
     @Test
     @DisplayName("Should return all items with pagination")
@@ -110,7 +110,10 @@ class CatalogServiceTests {
     void shouldThrowExceptionIfUpdatedItemPictureFileNameIsNotUnique() {
         CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null, "test.jpg", null));
         catalogService.save(generateCatalogItemDto(null, "test2.jpg", null));
-        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> catalogService.save(generateCatalogItemDto(savedItem.id(), "test2.jpg", null)));
+        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> {
+            catalogService.save(generateCatalogItemDto(savedItem.id(), "test2.jpg", null));
+            catalogService.flush();
+        });
         assertEquals(ConstraintViolationException.ConstraintKind.UNIQUE, ((ConstraintViolationException) exception.getCause()).getKind());
     }
 
@@ -119,7 +122,10 @@ class CatalogServiceTests {
     void shouldThrowExceptionIfUpdatedItemPictureUriIsNotUnique() {
         CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null, null, "uri/test.jpg"));
         catalogService.save(generateCatalogItemDto(null, null, "uri/test2.jpg"));
-        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> catalogService.save(generateCatalogItemDto(savedItem.id(), null, "uri/test2.jpg")));
+        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> {
+            catalogService.save(generateCatalogItemDto(savedItem.id(), null, "uri/test2.jpg"));
+            catalogService.flush();
+        });
         assertEquals(ConstraintViolationException.ConstraintKind.UNIQUE, ((ConstraintViolationException) exception.getCause()).getKind());
     }
 
