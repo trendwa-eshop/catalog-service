@@ -85,4 +85,6 @@ public interface CatalogService {
      * @param id the ID of the catalog item to delete
      */
     void deleteById(Long id);
+
+
 }

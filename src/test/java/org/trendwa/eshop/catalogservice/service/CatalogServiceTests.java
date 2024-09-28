@@ -1,8 +1,6 @@
 package org.trendwa.eshop.catalogservice.service;
 
 import org.hibernate.exception.ConstraintViolationException;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -11,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 import org.trendwa.eshop.catalogservice.TestcontainersConfiguration;
 import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
@@ -22,13 +20,15 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Import(TestcontainersConfiguration.class)
 @SpringBootTest
+@Import(TestcontainersConfiguration.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Transactional
 class CatalogServiceTests {
 
     @Autowired
     private CatalogService catalogService;
+
 
     @Test
     @DisplayName("Should return all items with pagination")
@@ -75,14 +75,12 @@ class CatalogServiceTests {
 
     @Test
     @DisplayName("Should add item")
-    @DirtiesContext
     void shouldAddItem() {
         assertNotNull(catalogService.save(generateCatalogItemDto(null)).id());
     }
 
     @Test
     @DisplayName("Should throw exception if item's picture file name is not unique")
-    @DirtiesContext
     void shouldThrowExceptionIfItemPictureFileNameIsNotUnique() {
         CatalogItemDto itemToSave = generateCatalogItemDto(null, "test.jpg", null);
         catalogService.save(itemToSave);
@@ -92,7 +90,6 @@ class CatalogServiceTests {
 
     @Test
     @DisplayName("Should throw exception if item's picture URI is not unique")
-    @DirtiesContext
     void shouldThrowExceptionIfItemPictureUriIsNotUnique() {
         CatalogItemDto itemToSave = generateCatalogItemDto(null, null, "uri/test.jpg");
         catalogService.save(itemToSave);
@@ -102,7 +99,6 @@ class CatalogServiceTests {
 
     @Test
     @DisplayName("Should update item")
-    @DirtiesContext
     void shouldUpdateItem() {
         CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null));
         CatalogItemDto updatedItem = catalogService.save(generateCatalogItemDto(savedItem.id(), "test.jpg", null));
@@ -111,7 +107,6 @@ class CatalogServiceTests {
 
     @Test
     @DisplayName("Should throw exception if updated item's picture file name is not unique")
-    @DirtiesContext
     void shouldThrowExceptionIfUpdatedItemPictureFileNameIsNotUnique() {
         CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null, "test.jpg", null));
         catalogService.save(generateCatalogItemDto(null, "test2.jpg", null));
@@ -121,7 +116,6 @@ class CatalogServiceTests {
 
     @Test
     @DisplayName("Should throw exception if updated item's picture URI is not unique")
-    @DirtiesContext
     void shouldThrowExceptionIfUpdatedItemPictureUriIsNotUnique() {
         CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null, null, "uri/test.jpg"));
         catalogService.save(generateCatalogItemDto(null, null, "uri/test2.jpg"));
@@ -131,19 +125,19 @@ class CatalogServiceTests {
 
     @Test
     @DisplayName("Should remove item")
-    @DirtiesContext
     void shouldRemoveItem() {
         CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null));
         catalogService.deleteById(savedItem.id());
         assertThrows(CatalogItemNotFoundException.class, () -> catalogService.getItemById(savedItem.id()));
     }
 
-    private @NotNull CatalogItemDto generateCatalogItemDto(Long id, @Nullable String pictureFileName, @Nullable String pictureUri) {
+    private CatalogItemDto generateCatalogItemDto(Long id, String pictureFileName, String pictureUri) {
         return new CatalogItemDto(
                 id,
                 "Test Item",
                 "Test Description",
-                100.0, pictureFileName,
+                100.0,
+                pictureFileName,
                 pictureUri,
                 new CatalogTypeDto(1L),
                 new CatalogBrandDto(1L),
