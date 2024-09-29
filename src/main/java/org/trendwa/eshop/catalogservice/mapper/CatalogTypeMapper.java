@@ -17,8 +17,8 @@ public class CatalogTypeMapper {
 
     public static CatalogType mapToEntity(CatalogTypeDto catalogTypeDto) {
         var catalogType = new CatalogType();
-        catalogType.setId(catalogTypeDto.id());
-        catalogType.setName(catalogTypeDto.name());
+        catalogType.setId(catalogTypeDto.getId());
+        catalogType.setName(catalogTypeDto.getName());
         return catalogType;
     }
 }

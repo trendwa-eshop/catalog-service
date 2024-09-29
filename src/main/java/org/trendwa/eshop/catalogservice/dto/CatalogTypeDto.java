@@ -1,7 +1,17 @@
 package org.trendwa.eshop.catalogservice.dto;
 
-public record CatalogTypeDto(Long id, String name) {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class CatalogTypeDto {
+    private Long id;
+    private String name;
+
     public CatalogTypeDto(Long id) {
-        this(id, null);
+        this.id = id;
     }
 }
