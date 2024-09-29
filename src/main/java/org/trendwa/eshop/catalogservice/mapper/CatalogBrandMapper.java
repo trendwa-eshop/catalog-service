@@ -17,8 +17,8 @@ public class CatalogBrandMapper {
 
         public static CatalogBrand mapToEntity(CatalogBrandDto catalogBrandDto) {
             var catalogBrand = new CatalogBrand();
-            catalogBrand.setId(catalogBrandDto.id());
-            catalogBrand.setName(catalogBrandDto.name());
+            catalogBrand.setId(catalogBrandDto.getId());
+            catalogBrand.setName(catalogBrandDto.getName());
             return catalogBrand;
         }
 }

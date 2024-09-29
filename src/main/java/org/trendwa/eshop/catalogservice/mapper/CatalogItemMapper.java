@@ -27,18 +27,18 @@ public class CatalogItemMapper {
     public static CatalogItem mapToEntity(CatalogItemDto catalogItemDto) {
         var catalogItem = new CatalogItem();
 
-        catalogItem.setId(catalogItemDto.id());
-        catalogItem.setName(catalogItemDto.name());
-        catalogItem.setDescription(catalogItemDto.description());
-        catalogItem.setPrice(catalogItemDto.price());
-        catalogItem.setPictureFileName(catalogItemDto.pictureFileName());
-        catalogItem.setPictureUri(catalogItemDto.pictureUri());
-        catalogItem.setCatalogType(CatalogTypeMapper.mapToEntity(catalogItemDto.catalogType()));
-        catalogItem.setCatalogBrand(CatalogBrandMapper.mapToEntity(catalogItemDto.catalogBrand()));
-        catalogItem.setAvailableStock(catalogItemDto.availableStock());
-        catalogItem.setRestockThreshold(catalogItemDto.restockThreshold());
-        catalogItem.setMaxStockThreshold(catalogItemDto.maxStockThreshold());
-        catalogItem.setOnReorder(catalogItemDto.onReorder());
+        catalogItem.setId(catalogItemDto.getId());
+        catalogItem.setName(catalogItemDto.getName());
+        catalogItem.setDescription(catalogItemDto.getDescription());
+        catalogItem.setPrice(catalogItemDto.getPrice());
+        catalogItem.setPictureFileName(catalogItemDto.getPictureFileName());
+        catalogItem.setPictureUri(catalogItemDto.getPictureUri());
+        catalogItem.setCatalogType(CatalogTypeMapper.mapToEntity(catalogItemDto.getCatalogType()));
+        catalogItem.setCatalogBrand(CatalogBrandMapper.mapToEntity(catalogItemDto.getCatalogBrand()));
+        catalogItem.setAvailableStock(catalogItemDto.getAvailableStock());
+        catalogItem.setRestockThreshold(catalogItemDto.getRestockThreshold());
+        catalogItem.setMaxStockThreshold(catalogItemDto.getMaxStockThreshold());
+        catalogItem.setOnReorder(catalogItemDto.isOnReorder());
 
         return catalogItem;
     }

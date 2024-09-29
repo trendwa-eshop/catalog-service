@@ -90,7 +90,7 @@ class CatalogServiceTests {
     @Test
     @DisplayName("Should add item")
     void shouldAddItem() {
-        assertNotNull(catalogService.save(generateCatalogItemDto(null)).id());
+        assertNotNull(catalogService.save(generateCatalogItemDto(null)).getId());
     }
 
     @Test
@@ -115,8 +115,8 @@ class CatalogServiceTests {
     @DisplayName("Should update item")
     void shouldUpdateItem() {
         CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null));
-        CatalogItemDto updatedItem = catalogService.save(generateCatalogItemDto(savedItem.id(), "test.jpg", null));
-        assertEquals("test.jpg", updatedItem.pictureFileName());
+        CatalogItemDto updatedItem = catalogService.save(generateCatalogItemDto(savedItem.getId(), "test.jpg", null));
+        assertEquals("test.jpg", updatedItem.getPictureFileName());
     }
 
     @Test
@@ -125,7 +125,7 @@ class CatalogServiceTests {
         CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null, "test.jpg", null));
         catalogService.save(generateCatalogItemDto(null, "test2.jpg", null));
         DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> {
-            catalogService.save(generateCatalogItemDto(savedItem.id(), "test2.jpg", null));
+            catalogService.save(generateCatalogItemDto(savedItem.getId(), "test2.jpg", null));
             catalogService.flush();
         });
         assertEquals(ConstraintViolationException.ConstraintKind.UNIQUE, ((ConstraintViolationException) exception.getCause()).getKind());
@@ -137,7 +137,7 @@ class CatalogServiceTests {
         CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null, null, "uri/test.jpg"));
         catalogService.save(generateCatalogItemDto(null, null, "uri/test2.jpg"));
         DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> {
-            catalogService.save(generateCatalogItemDto(savedItem.id(), null, "uri/test2.jpg"));
+            catalogService.save(generateCatalogItemDto(savedItem.getId(), null, "uri/test2.jpg"));
             catalogService.flush();
         });
         assertEquals(ConstraintViolationException.ConstraintKind.UNIQUE, ((ConstraintViolationException) exception.getCause()).getKind());
@@ -147,8 +147,8 @@ class CatalogServiceTests {
     @DisplayName("Should remove item")
     void shouldRemoveItem() {
         CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null));
-        catalogService.deleteById(savedItem.id());
-        assertThrows(CatalogItemNotFoundException.class, () -> catalogService.getItemById(savedItem.id()));
+        catalogService.deleteById(savedItem.getId());
+        assertThrows(CatalogItemNotFoundException.class, () -> catalogService.getItemById(savedItem.getId()));
     }
 
     private CatalogItemDto generateCatalogItemDto(Long id, String pictureFileName, String pictureUri) {

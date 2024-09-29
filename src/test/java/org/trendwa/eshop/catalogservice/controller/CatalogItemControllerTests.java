@@ -29,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource(locations = "classpath:application-test.properties")
 @Transactional
 @DisplayName("Catalog Item Controller Tests")
-
 class CatalogItemControllerTests {
 
     @Autowired
@@ -201,17 +200,17 @@ class CatalogItemControllerTests {
     }
 
     private void assertUpdatedItem(CatalogItemDto actual, CatalogItemDto expected) {
-        assertEquals(expected.name(), actual.name());
-        assertEquals(expected.description(), actual.description());
-        assertEquals(expected.price(), actual.price());
-        assertEquals(expected.pictureFileName(), actual.pictureFileName());
-        assertEquals(expected.pictureUri(), actual.pictureUri());
-        assertEquals(expected.catalogType().id(), actual.catalogType().id());
-        assertEquals(expected.catalogBrand().id(), actual.catalogBrand().id());
-        assertEquals(expected.availableStock(), actual.availableStock());
-        assertEquals(expected.restockThreshold(), actual.restockThreshold());
-        assertEquals(expected.maxStockThreshold(), actual.maxStockThreshold());
-        assertEquals(expected.onReorder(), actual.onReorder());
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getDescription(), actual.getDescription());
+        assertEquals(expected.getPrice(), actual.getPrice());
+        assertEquals(expected.getPictureFileName(), actual.getPictureFileName());
+        assertEquals(expected.getPictureUri(), actual.getPictureUri());
+        assertEquals(expected.getCatalogType().getId(), actual.getCatalogType().getId());
+        assertEquals(expected.getCatalogBrand().getId(), actual.getCatalogBrand().getId());
+        assertEquals(expected.getAvailableStock(), actual.getAvailableStock());
+        assertEquals(expected.getRestockThreshold(), actual.getRestockThreshold());
+        assertEquals(expected.getMaxStockThreshold(), actual.getMaxStockThreshold());
+        assertEquals(expected.isOnReorder(), actual.isOnReorder());
     }
 
     private void assertCreatedItem(CatalogItemDto actual, CatalogItemDto expected) {
