@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -97,7 +98,7 @@ public class CatalogItemController {
             @ApiResponse(responseCode = "200", description = "Successfully updated item"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<Void> updateItem(@RequestBody CatalogItemDto item) {
+    public ResponseEntity<Void> updateItem(@Valid @RequestBody CatalogItemDto item) {
         catalogService.save(item);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -108,7 +109,7 @@ public class CatalogItemController {
             @ApiResponse(responseCode = "201", description = "Successfully created item"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<CatalogItemDto> createItem(@RequestBody CatalogItemDto item) {
+    public ResponseEntity<CatalogItemDto> createItem(@Valid @RequestBody CatalogItemDto item) {
         CatalogItemDto createdItem = catalogService.save(item);
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath("/items/{id}");

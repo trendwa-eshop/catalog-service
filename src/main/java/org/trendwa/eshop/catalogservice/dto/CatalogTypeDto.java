@@ -4,15 +4,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.trendwa.eshop.catalogservice.validation.CatalogTypeValidations.*;
 
 @Schema(description = "Schema for Catalog Type")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CatalogTypeDto {
+
     @Schema(description = "Unique identifier of the catalog type", example = "1")
     private Long id;
 
+    @Name
     @Schema(description = "Name of the catalog type", example = "Smartphone")
     private String name;
 
