@@ -41,8 +41,9 @@ class CatalogItemControllerTests {
         AppTestUtils.insertSimpleData(testContextManager.getTestContext());
     }
 
+    @BeforeAll
     @AfterEach
-    void afterEach() throws Exception {
+    void afterEachAndBeforeAll() throws Exception {
         testContextManager.prepareTestInstance(this);
         AppTestUtils.resetDatabase(testContextManager.getTestContext());
     }
