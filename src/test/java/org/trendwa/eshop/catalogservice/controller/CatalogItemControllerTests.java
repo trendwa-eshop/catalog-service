@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestcontainersConfiguration.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@TestPropertySource(locations = "classpath:application-test.properties")
 @Transactional
 @DisplayName("Catalog Item Controller Tests")
 class CatalogItemControllerTests {
@@ -42,8 +41,9 @@ class CatalogItemControllerTests {
         AppTestUtils.insertSimpleData(testContextManager.getTestContext());
     }
 
+    @BeforeAll
     @AfterEach
-    void afterEach() throws Exception {
+    void afterEachAndBeforeAll() throws Exception {
         testContextManager.prepareTestInstance(this);
         AppTestUtils.resetDatabase(testContextManager.getTestContext());
     }
