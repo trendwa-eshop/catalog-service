@@ -34,9 +34,7 @@ public class CatalogItemController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<List<CatalogItemDto>> getAllItems(Pageable pageable) {
-        log.info("GET /items called ");
         List<CatalogItemDto> items = catalogService.getAll(pageable);
-        log.debug("GET /items response: {}", items);
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
@@ -48,9 +46,7 @@ public class CatalogItemController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<CatalogItemDto> getItemById(@PathVariable Long id) {
-        log.info("GET /items/{} called ", id);
         CatalogItemDto item = catalogService.getItemById(id);
-        log.debug("GET /items/{} response: {}", id, item);
         return new ResponseEntity<>(item, HttpStatus.OK);
     }
 
@@ -61,9 +57,7 @@ public class CatalogItemController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<List<CatalogItemDto>> getItemsByIds(@RequestParam List<Long> ids) {
-        log.info("GET /items/by called with ids: {}", ids.toString());
         List<CatalogItemDto> items = catalogService.getItemsByIds(ids);
-        log.debug("GET /items/by response: {}", items);
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
@@ -74,9 +68,7 @@ public class CatalogItemController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<List<CatalogItemDto>> getItemsByNameContaining(@PathVariable String name, Pageable pageable) {
-        log.info("GET /items/by/{} called ", name);
         List<CatalogItemDto> items = catalogService.getItemsByNameContaining(name, pageable);
-        log.debug("GET /items/by/{} response: {}", name, items);
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
@@ -87,9 +79,7 @@ public class CatalogItemController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<List<CatalogItemDto>> getItemsByBrandAndTypeId(@PathVariable Long typeId, @PathVariable Long brandId, Pageable pageable) {
-        log.info("GET /items/type/{}/brand/{} called ", typeId, brandId);
         List<CatalogItemDto> items = catalogService.getItemsByBrandAndType(String.valueOf(brandId), String.valueOf(typeId), pageable);
-        log.debug("GET /items/type/{}/brand/{} response: {}", typeId, brandId, items);
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
@@ -100,9 +90,7 @@ public class CatalogItemController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<List<CatalogItemDto>> getItemsByBrandId(@PathVariable Long brandId, Pageable pageable) {
-        log.info("GET /items/type/all/brand/{} called ", brandId);
         List<CatalogItemDto> items = catalogService.getItemsByBrand(String.valueOf(brandId), pageable);
-        log.debug("GET /items/type/all/brand/{} response: {}", brandId, items);
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
@@ -113,9 +101,7 @@ public class CatalogItemController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<Void> updateItem(@Valid @RequestBody CatalogItemDto item) {
-        log.info("PUT /items called with item: {}", item);
         catalogService.save(item);
-        log.debug("PUT /items response: {}", item);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -126,9 +112,7 @@ public class CatalogItemController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<CatalogItemDto> createItem(@Valid @RequestBody CatalogItemDto item) {
-        log.info("POST /items called with item: {}", item);
         CatalogItemDto createdItem = catalogService.save(item);
-        log.debug("POST /items response: {}", createdItem);
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath("/items/{id}");
         UriComponents uriComponents = uriBuilder.buildAndExpand(createdItem.getId());
@@ -143,7 +127,6 @@ public class CatalogItemController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<Void> deleteItemById(@PathVariable Long id) {
-        log.info("DELETE /items/{} called ", id);
         catalogService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
