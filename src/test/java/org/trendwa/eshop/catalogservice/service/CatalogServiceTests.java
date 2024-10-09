@@ -35,6 +35,7 @@ class CatalogServiceTests {
     @BeforeAll
     void beforeAll() throws Exception {
         testContextManager.prepareTestInstance(this);
+        AppTestUtils.resetDatabase(testContextManager.getTestContext());
         AppTestUtils.insertSimpleData(testContextManager.getTestContext());
     }
 
