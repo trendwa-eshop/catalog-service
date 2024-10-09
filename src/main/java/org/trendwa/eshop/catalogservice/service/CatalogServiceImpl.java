@@ -26,38 +26,27 @@ public class CatalogServiceImpl implements CatalogService{
     @Override
     public List<CatalogItemDto> getAll(Pageable pageable) {
 
-        log.debug("getAll called with pageable: {}", pageable);
         Page<CatalogItem> page = catalogItemRepository.findAll(
                 PageRequest.of(pageable.getPageNumber(), pageable.getPageSize())
         );
-        List<CatalogItemDto> items = page.map(CatalogItemMapper::mapToDto).getContent();
-        log.debug("getAll completed with items: {}", items);
-        return items;
+        return page.map(CatalogItemMapper::mapToDto).getContent();
     }
 
     @Override
     public CatalogItemDto getItemById(Long id) {
-        log.debug("getItemById called with id: {}", id);
         CatalogItem catalogItem = catalogItemRepository.findById(id).orElseThrow(() -> new CatalogItemNotFoundException("Catalog item not found with id: " + id));
-        CatalogItemDto itemDto = CatalogItemMapper.mapToDto(catalogItem);
-        log.debug("getItemById completed with item: {}", itemDto);
-        return itemDto;
+        return CatalogItemMapper.mapToDto(catalogItem);
     }
 
     @Override
     public List<CatalogItemDto> getItemsByIds(List<Long> ids) {
-        log.debug("getItemsByIds called with ids: {}", ids);
         var items = catalogItemRepository.findAllById(ids);
-        List<CatalogItemDto> itemDtos = items.stream().map(CatalogItemMapper::mapToDto).toList();
-        log.debug("getItemsByIds completed with items: {}", itemDtos);
-        return itemDtos;
+        return items.stream().map(CatalogItemMapper::mapToDto).toList();
     }
 
     @Override
     public List<CatalogItemDto> getItemsByNameContaining(String name, Pageable pageable) {
-        log.debug("getItemsByNameContaining called with name: {} and pageable: {}", name, pageable);
         List<CatalogItem> items = catalogItemRepository.findByNameContaining(name, pageable);
-        log.debug("getItemsByNameContaining completed with items: {}", items);
         return items.stream().map(CatalogItemMapper::mapToDto).toList();
     }
 
