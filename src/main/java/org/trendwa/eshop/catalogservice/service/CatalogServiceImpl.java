@@ -19,16 +19,14 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CatalogServiceImpl implements CatalogService{
+public class CatalogServiceImpl implements CatalogService {
 
     private final CatalogItemRepository catalogItemRepository;
 
     @Override
     public List<CatalogItemDto> getAll(Pageable pageable) {
 
-        Page<CatalogItem> page = catalogItemRepository.findAll(
-                PageRequest.of(pageable.getPageNumber(), pageable.getPageSize())
-        );
+        Page<CatalogItem> page = catalogItemRepository.findAll(pageable);
         return page.map(CatalogItemMapper::mapToDto).getContent();
     }
 
@@ -77,7 +75,7 @@ public class CatalogServiceImpl implements CatalogService{
 
     @Override
     public void deleteById(Long id) {
-        if(catalogItemRepository.existsById(id)){
+        if (catalogItemRepository.existsById(id)) {
             catalogItemRepository.deleteById(id);
             return;
         }
@@ -88,5 +86,4 @@ public class CatalogServiceImpl implements CatalogService{
     public void flush() {
         catalogItemRepository.flush();
     }
-
 }
