@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @Getter @Setter @ToString
-@EqualsAndHashCode
 @NoArgsConstructor
 public abstract class ApplicationEntity {
 

@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.TestContextManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +51,14 @@ class CatalogServiceTests {
     void shouldReturnAllItems() {
         List<CatalogItemDto> response = catalogService.getAll(PageRequest.of(0, 5));
         assertEquals(5, response.size());
+    }
+
+    @Test
+    @DisplayName("Should return all items with pagination and sorting")
+    void shouldReturnAllItemsWithPaginationAndSorting() {
+        List<CatalogItemDto> response = catalogService.getAll(PageRequest.of(0, 5, Sort.by("name").ascending()));
+        assertEquals(5, response.size());
+        assertTrue(response.get(0).getName().compareTo(response.get(1).getName()) <= 0);
     }
 
     @Test
