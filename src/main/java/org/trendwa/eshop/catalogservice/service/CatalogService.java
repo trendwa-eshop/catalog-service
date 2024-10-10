@@ -2,13 +2,31 @@ package org.trendwa.eshop.catalogservice.service;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
+import org.trendwa.eshop.catalogservice.dto.CatalogTypeDto;
 
 import java.util.List;
 
 @Service
 public interface CatalogService {
 
+
+    /**
+     * Retrieves a paginated list of catalog brands.
+     *
+     * @param pageable the pagination information
+     * @return a list of catalog brand DTOs
+     */
+    List<CatalogBrandDto> getBrands(Pageable pageable);
+
+    /**
+     * Retrieves a paginated list of catalog types.
+     *
+     * @param pageable the pagination information
+     * @return a list of catalog type DTOs
+     */
+    List<CatalogTypeDto> getTypes(Pageable pageable);
 
     /**
      * Retrieves all catalog items with pagination support.

@@ -4,6 +4,8 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -11,7 +13,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestContextManager;
-import org.springframework.test.context.TestPropertySource;
 import org.trendwa.eshop.catalogservice.TestcontainersConfiguration;
 import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
@@ -182,6 +183,7 @@ class CatalogItemControllerTests {
         assertCreatedItem(response.getBody(), newItem);
     }
 
+
     @Test
     @DisplayName("Should delete item by ID")
     void shouldDeleteItemById() {
@@ -197,6 +199,41 @@ class CatalogItemControllerTests {
         DocumentContext jsonContext = JsonPath.parse(allItemsResponse.getBody());
         List<Long> ids = jsonContext.read("$[*].id");
         assertFalse(ids.contains(1L));
+    }
+
+
+    @ParameterizedTest
+    @CsvSource({
+            "0, 1",
+            "1, 1",
+            "0, 2",
+    })
+    @DisplayName("Should return all catalog brands with pagination")
+    void shouldReturnAllCatalogBrands(int pageNumber, int pageSize) {
+        ResponseEntity<String> response = restTemplate.getForEntity("/brands?page=" + pageNumber + "&size=" + pageSize, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        DocumentContext jsonContext = JsonPath.parse(response.getBody());
+        int brandCount = jsonContext.read("$.length()");
+        assertEquals(pageSize, brandCount);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "0, 1",
+            "1, 1",
+            "0, 2",
+    })
+    @DisplayName("Should return all catalog types with pagination")
+    void shouldReturnAllCatalogTypes(int pageNumber, int pageSize) {
+        ResponseEntity<String> response = restTemplate.getForEntity("/types?page=" + pageNumber + "&size=" + pageSize, String.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        DocumentContext jsonContext = JsonPath.parse(response.getBody());
+        int typeCount = jsonContext.read("$.length()");
+        assertEquals(pageSize, typeCount);
     }
 
     private void assertUpdatedItem(CatalogItemDto actual, CatalogItemDto expected) {

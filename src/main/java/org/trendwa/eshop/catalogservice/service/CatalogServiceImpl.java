@@ -4,15 +4,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
+import org.trendwa.eshop.catalogservice.dto.CatalogTypeDto;
 import org.trendwa.eshop.catalogservice.exception.CatalogItemNotFoundException;
+import org.trendwa.eshop.catalogservice.mapper.CatalogBrandMapper;
 import org.trendwa.eshop.catalogservice.mapper.CatalogItemMapper;
+import org.trendwa.eshop.catalogservice.mapper.CatalogTypeMapper;
+import org.trendwa.eshop.catalogservice.model.CatalogBrand;
 import org.trendwa.eshop.catalogservice.model.CatalogItem;
+import org.trendwa.eshop.catalogservice.model.CatalogType;
+import org.trendwa.eshop.catalogservice.repository.CatalogBrandRepository;
 import org.trendwa.eshop.catalogservice.repository.CatalogItemRepository;
+import org.trendwa.eshop.catalogservice.repository.CatalogTypeRepository;
 
 import java.util.List;
 
@@ -22,6 +29,21 @@ import java.util.List;
 public class CatalogServiceImpl implements CatalogService {
 
     private final CatalogItemRepository catalogItemRepository;
+    private final CatalogBrandRepository catalogBrandRepository;
+    private final CatalogTypeRepository catalogTypeRepository;
+
+    @Override
+    public List<CatalogBrandDto> getBrands(Pageable pageable) {
+        Page<CatalogBrand> page = catalogBrandRepository.findAll(pageable);
+        return page.map(CatalogBrandMapper::mapToDto).getContent();
+    }
+
+    @Override
+    public List<CatalogTypeDto> getTypes(Pageable pageable) {
+        Page<CatalogType> page = catalogTypeRepository.findAll(pageable);
+        return page.map(CatalogTypeMapper::mapToDto).getContent();
+    }
+
 
     @Override
     public List<CatalogItemDto> getAll(Pageable pageable) {

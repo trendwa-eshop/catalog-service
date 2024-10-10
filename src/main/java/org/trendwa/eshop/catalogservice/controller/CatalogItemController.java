@@ -13,13 +13,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
+import org.trendwa.eshop.catalogservice.dto.CatalogTypeDto;
 import org.trendwa.eshop.catalogservice.service.CatalogService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/items")
 @Tag(name = "Catalog Item Controller", description = "Operations related to catalog items")
 @RequiredArgsConstructor
 @Slf4j
@@ -27,7 +28,19 @@ public class CatalogItemController {
 
     private final CatalogService catalogService;
 
-    @GetMapping
+    @GetMapping("/types")
+    @Operation(summary = "Get all catalog types", description = "Retrieve all catalog types with pagination")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<List<CatalogTypeDto>> getAllTypes(Pageable pageable) {
+        List<CatalogTypeDto> types = catalogService.getTypes(pageable);
+        return new ResponseEntity<>(types, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/items")
     @Operation(summary = "Get all items", description = "Retrieve all catalog items with pagination")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list"),
@@ -38,7 +51,7 @@ public class CatalogItemController {
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/items/{id}")
     @Operation(summary = "Get item by ID", description = "Retrieve a catalog item by its ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved item"),
@@ -50,7 +63,20 @@ public class CatalogItemController {
         return new ResponseEntity<>(item, HttpStatus.OK);
     }
 
-    @GetMapping("/by")
+    @GetMapping("/brands")
+    @Operation(summary = "Get all catalog brands", description = "Retrieve all catalog brands with pagination")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<List<CatalogBrandDto>> getAllBrands(Pageable pageable) {
+        List<CatalogBrandDto> brands = catalogService.getBrands(pageable);
+        return new ResponseEntity<>(brands, HttpStatus.OK);
+    }
+
+
+
+    @GetMapping("/items/by")
     @Operation(summary = "Get items by IDs", description = "Retrieve catalog items by their IDs with pagination")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved items"),
@@ -61,7 +87,7 @@ public class CatalogItemController {
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
-    @GetMapping("/by/{name}")
+    @GetMapping("/items/by/{name}")
     @Operation(summary = "Get items by name", description = "Retrieve catalog items containing the specified name with pagination")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved items"),
@@ -72,7 +98,7 @@ public class CatalogItemController {
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
-    @GetMapping("/type/{typeId}/brand/{brandId}")
+    @GetMapping("/items/type/{typeId}/brand/{brandId}")
     @Operation(summary = "Get items by brand and type ID", description = "Retrieve catalog items by brand and type ID with pagination")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved items"),
@@ -83,7 +109,7 @@ public class CatalogItemController {
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
-    @GetMapping("/type/all/brand/{brandId}")
+    @GetMapping("/items/type/all/brand/{brandId}")
     @Operation(summary = "Get items by brand ID", description = "Retrieve catalog items by brand ID with pagination")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved items"),
@@ -94,7 +120,7 @@ public class CatalogItemController {
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
-    @PutMapping
+    @PutMapping("/items")
     @Operation(summary = "Update item", description = "Update an existing catalog item")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully updated item"),
@@ -105,7 +131,7 @@ public class CatalogItemController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping
+    @PostMapping("/items")
     @Operation(summary = "Create item", description = "Create a new catalog item")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully created item"),
@@ -120,7 +146,7 @@ public class CatalogItemController {
         return ResponseEntity.created(uriComponents.toUri()).body(createdItem);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/items/{id}")
     @Operation(summary = "Delete item by ID", description = "Delete a catalog item by its ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Successfully deleted item"),
