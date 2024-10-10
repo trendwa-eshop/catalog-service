@@ -258,7 +258,7 @@ class CatalogItemTest {
                     ]
                     """;
 
-            assertThat(jsonList.parseObject(expected)).isEqualTo(catalogItems);
+            assertThat(jsonList.parseObject(expected)).usingRecursiveComparison().isEqualTo(catalogItems);
         }
     }
 
