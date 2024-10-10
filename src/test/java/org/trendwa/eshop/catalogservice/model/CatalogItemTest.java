@@ -80,7 +80,7 @@ class CatalogItemTest {
                       "onReorder": false
                     }
                     """;
-            assertThat(json.parseObject(expected))
+            assertThat(json.parseObject(expected)).usingRecursiveComparison()
                     .isEqualTo(catalogItems[0]);
         }
 
