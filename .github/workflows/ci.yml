@@ -1,10 +1,10 @@
 name: Build and Test
 
 on:
-  push:
-    branches:
-      - development
-      - main
+#  push:
+#    branches:
+#      - development
+#      - main
   pull_request:
     branches:
       - main
