@@ -13,10 +13,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestContextManager;
+import org.springframework.web.client.HttpClientErrorException;
 import org.trendwa.eshop.catalogservice.TestcontainersConfiguration;
 import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogTypeDto;
+import org.trendwa.eshop.catalogservice.dto.ErrorInfo;
 import org.trendwa.eshop.catalogservice.util.AppTestUtils;
 
 import java.util.List;
@@ -29,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional
 @DisplayName("Catalog Item Controller Tests")
-class CatalogItemControllerTests {
+class CatalogControllerTests {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -97,6 +99,18 @@ class CatalogItemControllerTests {
     }
 
     @Test
+    @DisplayName("Should return 404 Not Found for non-existing item")
+    void shouldReturnNotFoundForNonExistingItem() {
+        ResponseEntity<String> response = restTemplate.getForEntity("/items/999999999", String.class);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+
+        DocumentContext jsonContext = JsonPath.parse(response.getBody());
+        assertEquals("Catalog item not found with id: 999999999", jsonContext.read("$.message"));
+        assertEquals("The requested item was not found, please check the item id", jsonContext.read("$.details"));
+        assertEquals("CatalogItemNotFoundException", jsonContext.read("$.exceptionType"));
+    }
+
+    @Test
     @DisplayName("Should return items by name containing with pagination")
     void shouldReturnItemsByNameContaining() {
         ResponseEntity<String> response = restTemplate.getForEntity("/items/by/Air?page=0&size=10", String.class);
@@ -109,31 +123,35 @@ class CatalogItemControllerTests {
     }
 
     @Test
-    @DisplayName("Should return items by brand and type ID with pagination")
+    @DisplayName("Should return items by brand and type with pagination")
     void shouldReturnItemsByBrandAndTypeId() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/items/type/1/brand/1?page=0&size=10", String.class);
+        String type = "shoes";
+        String brand = "adidas";
+        ResponseEntity<String> response = restTemplate.getForEntity("/items/type/" + type + "/brand/" + brand + "?page=0&size=10", String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
 
         DocumentContext jsonContext = JsonPath.parse(response.getBody());
-        List<Integer> typeIds = jsonContext.read("$[*].catalogType.id");
-        List<Integer> brandIds = jsonContext.read("$[*].catalogBrand.id");
+        List<String> types = jsonContext.read("$[*].catalogType.name");
+        List<String> brands = jsonContext.read("$[*].catalogBrand.name");
 
-        assertTrue(typeIds.stream().allMatch(id -> id == 1));
-        assertTrue(brandIds.stream().allMatch(id -> id == 1));
+        assertTrue(types.stream().allMatch(t -> t.equalsIgnoreCase(type)));
+        assertTrue(brands.stream().allMatch(b -> b.equalsIgnoreCase(brand)));
+
     }
 
     @Test
-    @DisplayName("Should return items by brand ID with pagination")
+    @DisplayName("Should return items by brand with pagination")
     void shouldReturnItemsByBrandId() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/items/type/all/brand/1?page=0&size=10", String.class);
+        String brand = "nike";
+        ResponseEntity<String> response = restTemplate.getForEntity("/items/type/all/brand/" + brand + "?page=0&size=10", String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
 
         DocumentContext jsonContext = JsonPath.parse(response.getBody());
-        List<Integer> brandIds = jsonContext.read("$[*].catalogBrand.id");
+        List<String> brands = jsonContext.read("$[*].catalogBrand.name");
+        assertTrue(brands.stream().allMatch(b -> b.equalsIgnoreCase(brand)));
 
-        assertTrue(brandIds.stream().allMatch(id -> id == 1));
     }
 
     @Test

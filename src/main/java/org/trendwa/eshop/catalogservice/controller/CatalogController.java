@@ -1,14 +1,18 @@
 package org.trendwa.eshop.catalogservice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponents;
@@ -16,15 +20,17 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogTypeDto;
+import org.trendwa.eshop.catalogservice.dto.ErrorInfo;
 import org.trendwa.eshop.catalogservice.service.CatalogService;
 
 import java.util.List;
 
 @RestController
-@Tag(name = "Catalog Item Controller", description = "Operations related to catalog items")
+@Tag(name = "Catalog Controller", description = "Operations related to catalog")
+@RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
 @RequiredArgsConstructor
 @Slf4j
-public class CatalogItemController {
+public class CatalogController {
 
     private final CatalogService catalogService;
 
@@ -34,7 +40,7 @@ public class CatalogItemController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<List<CatalogTypeDto>> getAllTypes(Pageable pageable) {
+    public ResponseEntity<List<CatalogTypeDto>> getAllTypes(@ParameterObject Pageable pageable) {
         List<CatalogTypeDto> types = catalogService.getTypes(pageable);
         return new ResponseEntity<>(types, HttpStatus.OK);
     }
@@ -46,7 +52,7 @@ public class CatalogItemController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<List<CatalogItemDto>> getAllItems(Pageable pageable) {
+    public ResponseEntity<List<CatalogItemDto>> getAllItems(@ParameterObject Pageable pageable) {
         List<CatalogItemDto> items = catalogService.getAll(pageable);
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
@@ -54,9 +60,9 @@ public class CatalogItemController {
     @GetMapping("/items/{id}")
     @Operation(summary = "Get item by ID", description = "Retrieve a catalog item by its ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved item"),
-            @ApiResponse(responseCode = "404", description = "Item not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved item", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "Item not found", content = @Content(schema = @Schema(implementation = ErrorInfo.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = ErrorInfo.class)))
     })
     public ResponseEntity<CatalogItemDto> getItemById(@PathVariable Long id) {
         CatalogItemDto item = catalogService.getItemById(id);
@@ -69,7 +75,7 @@ public class CatalogItemController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<List<CatalogBrandDto>> getAllBrands(Pageable pageable) {
+    public ResponseEntity<List<CatalogBrandDto>> getAllBrands(@ParameterObject Pageable pageable) {
         List<CatalogBrandDto> brands = catalogService.getBrands(pageable);
         return new ResponseEntity<>(brands, HttpStatus.OK);
     }
@@ -93,30 +99,30 @@ public class CatalogItemController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved items"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<List<CatalogItemDto>> getItemsByNameContaining(@PathVariable String name, Pageable pageable) {
+    public ResponseEntity<List<CatalogItemDto>> getItemsByNameContaining(@PathVariable String name, @ParameterObject Pageable pageable) {
         List<CatalogItemDto> items = catalogService.getItemsByNameContaining(name, pageable);
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
-    @GetMapping("/items/type/{typeId}/brand/{brandId}")
-    @Operation(summary = "Get items by brand and type ID", description = "Retrieve catalog items by brand and type ID with pagination")
+    @GetMapping("/items/type/{type}/brand/{brand}")
+    @Operation(summary = "Get items by brand and type ", description = "Retrieve catalog items by brand and type with pagination")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved items"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<List<CatalogItemDto>> getItemsByBrandAndTypeId(@PathVariable Long typeId, @PathVariable Long brandId, Pageable pageable) {
-        List<CatalogItemDto> items = catalogService.getItemsByBrandAndType(String.valueOf(brandId), String.valueOf(typeId), pageable);
+    public ResponseEntity<List<CatalogItemDto>> getItemsByBrandAndType(@PathVariable String type, @PathVariable String brand, @ParameterObject Pageable pageable) {
+        List<CatalogItemDto> items = catalogService.getItemsByBrandAndType(brand, type, pageable);
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
-    @GetMapping("/items/type/all/brand/{brandId}")
-    @Operation(summary = "Get items by brand ID", description = "Retrieve catalog items by brand ID with pagination")
+    @GetMapping("/items/type/all/brand/{brand}")
+    @Operation(summary = "Get items by brand", description = "Retrieve catalog items by brand with pagination")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved items"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<List<CatalogItemDto>> getItemsByBrandId(@PathVariable Long brandId, Pageable pageable) {
-        List<CatalogItemDto> items = catalogService.getItemsByBrand(String.valueOf(brandId), pageable);
+    public ResponseEntity<List<CatalogItemDto>> getItemsByBrandId(@PathVariable String brand, @ParameterObject Pageable pageable) {
+        List<CatalogItemDto> items = catalogService.getItemsByBrand(String.valueOf(brand), pageable);
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
