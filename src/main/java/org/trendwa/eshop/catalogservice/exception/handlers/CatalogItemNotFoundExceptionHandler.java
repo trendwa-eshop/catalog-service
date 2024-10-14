@@ -9,7 +9,7 @@ import org.trendwa.eshop.catalogservice.dto.ErrorInfo;
 import org.trendwa.eshop.catalogservice.exception.CatalogItemNotFoundException;
 
 @ControllerAdvice
-public class CatalogItemNotFoundExceptionHandler extends RestExceptionHandler {
+public class CatalogItemNotFoundExceptionHandler extends ExceptionHandlerRest {
 
     @ExceptionHandler(CatalogItemNotFoundException.class)
     public ResponseEntity<ErrorInfo> handleCatalogItemNotFoundException(CatalogItemNotFoundException exception, WebRequest request) {
