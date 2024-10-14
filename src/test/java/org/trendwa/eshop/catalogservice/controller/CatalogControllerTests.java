@@ -13,12 +13,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestContextManager;
-import org.springframework.web.client.HttpClientErrorException;
 import org.trendwa.eshop.catalogservice.TestcontainersConfiguration;
 import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogTypeDto;
-import org.trendwa.eshop.catalogservice.dto.ErrorInfo;
 import org.trendwa.eshop.catalogservice.util.AppTestUtils;
 
 import java.util.List;
@@ -86,7 +84,7 @@ class CatalogControllerTests {
         List<Integer> numberList = jsonContext.read("$[*].id", List.class);
         List<Long> returnedIds = numberList.stream()
                 .map(Number::longValue)
-                .collect(Collectors.toList());
+                .toList();
         assertEquals(requestedIds, returnedIds);
     }
 
