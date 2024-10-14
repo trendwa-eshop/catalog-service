@@ -9,7 +9,7 @@ import org.trendwa.eshop.catalogservice.dto.ErrorInfo;
 import org.trendwa.eshop.catalogservice.exception.domain.CatalogDomainException;
 
 @ControllerAdvice
-public class CatalogDomainExceptionHandler extends RestExceptionHandler {
+public class CatalogDomainExceptionHandler extends ExceptionHandlerRest {
 
     @ExceptionHandler(CatalogDomainException.class)
     public ResponseEntity<ErrorInfo> handleCatalogDomainException(CatalogDomainException exception, WebRequest webRequest) {

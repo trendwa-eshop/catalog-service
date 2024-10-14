@@ -9,7 +9,7 @@ import org.trendwa.eshop.catalogservice.dto.ErrorInfo;
 
 import java.time.LocalDateTime;
 
-public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+public class ExceptionHandlerRest extends ResponseEntityExceptionHandler {
 
     protected ResponseEntity<ErrorInfo> buildErrorResponse(Exception exception, WebRequest webRequest, HttpStatus status, String details) {
         ErrorInfo errorInfo = new ErrorInfo();

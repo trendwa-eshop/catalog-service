@@ -10,4 +10,4 @@ This API is used to manage the products in the Trendwa-eshop catalog. It allows 
 1. Clone the repository
 2. Open the project in your IDE
 3. Run the project
-4. The API will be available at `http://localhost:9095`
+4. The API will be available at `http://localhost
