@@ -4,6 +4,21 @@
       "name": "version",
       "type": "java.lang.String",
       "description": "The version of the application."
+    },
+    {
+      "name": "aws.s3.bucket.name",
+      "type": "java.lang.String",
+      "description": "The name of the AWS S3 bucket."
+    },
+    {
+      "name": "aws.s3.bucket.region",
+      "type": "java.lang.String",
+      "description": "The region of the AWS S3 bucket."
+    },
+    {
+      "name": "application.file-storage.allowed-mime-types",
+      "type": "java.lang.String",
+      "description": "The allowed MIME types for file storage."
     }
   ]
 }

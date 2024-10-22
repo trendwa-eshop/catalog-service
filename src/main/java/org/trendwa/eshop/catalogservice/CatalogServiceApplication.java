@@ -4,14 +4,13 @@ import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.servers.Server;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.trendwa.eshop.catalogservice.repository.ApplicationJpaRepositoryImpl;
 
 @SpringBootApplication
-
 @OpenAPIDefinition(
         info = @Info(
                 title = "Trendwa E-Shop Catalog Service API",
@@ -34,6 +33,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
                 url = "https://trendwa.com.tr/docs"
         )
 )
+@EnableJpaRepositories(repositoryBaseClass = ApplicationJpaRepositoryImpl.class)
 public class CatalogServiceApplication {
 
     public static void main(String[] args) {

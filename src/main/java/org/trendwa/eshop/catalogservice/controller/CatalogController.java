@@ -6,7 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
@@ -17,12 +18,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
-import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
-import org.trendwa.eshop.catalogservice.dto.CatalogTypeDto;
-import org.trendwa.eshop.catalogservice.dto.ErrorInfo;
+import org.trendwa.eshop.catalogservice.dto.*;
 import org.trendwa.eshop.catalogservice.service.CatalogService;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -81,7 +80,6 @@ public class CatalogController {
     }
 
 
-
     @GetMapping("/items/by")
     @Operation(summary = "Get items by IDs", description = "Retrieve catalog items by their IDs with pagination")
     @ApiResponses(value = {
@@ -126,31 +124,37 @@ public class CatalogController {
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
-    @PutMapping("/items")
+    @PutMapping(value = "/items",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @Operation(summary = "Update item", description = "Update an existing catalog item")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully updated item"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<Void> updateItem(@Valid @RequestBody CatalogItemDto item) {
-        catalogService.save(item);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Void> updateItem(@ModelAttribute CatalogItemForm form) throws IOException {
+        catalogService.update(form.toDto(), form.getImage());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/items")
+    @PostMapping(
+            value = "/items",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
+    )
     @Operation(summary = "Create item", description = "Create a new catalog item")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully created item"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<CatalogItemDto> createItem(@Valid @RequestBody CatalogItemDto item) {
-        CatalogItemDto createdItem = catalogService.save(item);
-
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath("/items/{id}");
+    @Transactional
+    public ResponseEntity<CatalogItemDto> createItem(
+            @ModelAttribute CatalogItemForm form, HttpServletRequest request) throws IOException {
+        CatalogItemDto createdItem = catalogService.create(form.toDto(), form.getImage());
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(request.getContextPath() + "/items/{id}");
         UriComponents uriComponents = uriBuilder.buildAndExpand(createdItem.getId());
 
         return ResponseEntity.created(uriComponents.toUri()).body(createdItem);
     }
+
 
     @DeleteMapping("/items/{id}")
     @Operation(summary = "Delete item by ID", description = "Delete a catalog item by its ID")

@@ -15,7 +15,7 @@ import org.trendwa.eshop.catalogservice.validation.CatalogItemValidations.Stock;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CatalogItemDto {
-    @Schema(description = "Unique identifier of the catalog item", example = "1")
+    @Schema(description = "Unique identifier of the catalog item, if you are updating an existing item, please provide the ID")
     private Long id;
 
     @Name
@@ -30,16 +30,16 @@ public class CatalogItemDto {
     @Schema(description = "Price of the catalog item", example = "999.99")
     private Double price;
 
-    @Schema(description = "File name of the catalog item's picture", example = "iphone13.jpg")
+    @Schema(description = "File name of the catalog item's picture")
     private String pictureFileName;
 
-    @Schema(description = "URI of the catalog item's picture", example = "uri/iphone13.jpg")
+    @Schema(description = "URI of the catalog item's picture")
     private String pictureUri;
 
-    @Schema(description = "Type of the catalog item", example = "{\"id\": 1, \"type\": \"Smartphone\"}")
+    @Schema(description = "Type of the catalog item", example = "1")
     private CatalogTypeDto catalogType;
 
-    @Schema(description = "Brand of the catalog item", example = "{\"id\": 1, \"brand\": \"Apple\"}")
+    @Schema(description = "Brand of the catalog item", example = "1")
     private CatalogBrandDto catalogBrand;
 
     @Stock

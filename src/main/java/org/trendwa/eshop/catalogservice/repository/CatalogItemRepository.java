@@ -1,16 +1,16 @@
 package org.trendwa.eshop.catalogservice.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.trendwa.eshop.catalogservice.model.CatalogItem;
 import org.springframework.data.domain.Pageable;
+import org.trendwa.eshop.catalogservice.model.CatalogItem;
+
 import java.util.List;
 
 /**
  * Repository interface for CatalogItem entities.
- * Extends JpaRepository to provide CRUD operations and custom query methods.
+ * Extends ApplicationJpaRepository to provide CRUD operations and custom query methods.
  * @author Musa Beytekin
  */
-public interface CatalogItemRepository extends JpaRepository<CatalogItem, Long> {
+public interface CatalogItemRepository extends ApplicationJpaRepository<CatalogItem, Long> {
 
     /**
      * Finds a list of CatalogItem entities where the name contains the specified string.
