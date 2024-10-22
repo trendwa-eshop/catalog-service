@@ -31,12 +31,12 @@ public class CatalogItem extends ApplicationEntity {
     private String pictureUri;
 
     @ManyToOne(cascade = {
-            CascadeType.DETACH, CascadeType.REFRESH})
+            CascadeType.DETACH})
     @JoinColumn(name = "catalog_type_id")
     private CatalogType catalogType;
 
     @ManyToOne(cascade = {
-            CascadeType.DETACH, CascadeType.REFRESH})
+            CascadeType.DETACH})
     @JoinColumn(name = "catalog_brand_id")
     private CatalogBrand catalogBrand;
 

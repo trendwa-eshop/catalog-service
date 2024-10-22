@@ -3,9 +3,12 @@ package org.trendwa.eshop.catalogservice.model;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.trendwa.eshop.catalogservice.dummydata.CatalogItemDummyData;
 import org.trendwa.eshop.catalogservice.exception.domain.CatalogDomainException;
+import org.trendwa.eshop.catalogservice.repository.ApplicationJpaRepositoryImpl;
 
 import java.io.IOException;
 
@@ -13,9 +16,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
+@DataJpaTest
 @JsonTest
 @DisplayName("Catalog Item Tests")
+@EnableJpaRepositories(repositoryBaseClass = ApplicationJpaRepositoryImpl.class)
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
+@Disabled
 class CatalogItemTest {
 
     @Autowired

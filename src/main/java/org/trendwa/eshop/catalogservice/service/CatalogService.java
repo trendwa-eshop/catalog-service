@@ -2,10 +2,12 @@ package org.trendwa.eshop.catalogservice.service;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogTypeDto;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -90,12 +92,22 @@ public interface CatalogService {
     List<CatalogItemDto> getItemsByBrandAndType(String brand, String type, Pageable pageable);
 
     /**
-     * Saves a catalog item.
+     * Creates a new catalog item.
      *
-     * @param item the catalog item to save
-     * @return the saved catalog item
+     * @param item         the catalog item to create
+     * @param productImage the product image to upload
+     * @return the created catalog item
      */
-    CatalogItemDto save(CatalogItemDto item);
+    CatalogItemDto create(CatalogItemDto item, MultipartFile productImage) throws IOException;
+
+    /**
+     * Updates an existing catalog item.
+     *
+     * @param item         the catalog item to update
+     * @param productImage the product image to upload
+     * @throws IOException if an I/O error occurs during file upload
+     */
+    void update(CatalogItemDto item, MultipartFile productImage) throws IOException;
 
     /**
      * Deletes a catalog item by its ID.

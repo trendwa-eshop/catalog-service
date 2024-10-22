@@ -2,39 +2,54 @@ package org.trendwa.eshop.catalogservice.controller;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.TestContextManager;
-import org.springframework.web.client.HttpClientErrorException;
-import org.trendwa.eshop.catalogservice.TestcontainersConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.multipart.MultipartFile;
+import org.trendwa.eshop.catalogservice.AppTestConfiguration;
 import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogTypeDto;
-import org.trendwa.eshop.catalogservice.dto.ErrorInfo;
+import org.trendwa.eshop.catalogservice.service.FileStorageService;
 import org.trendwa.eshop.catalogservice.util.AppTestUtils;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TestcontainersConfiguration.class)
+@Import(AppTestConfiguration.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional
+@TestPropertySource(locations = "classpath:application-test.properties")
 @DisplayName("Catalog Item Controller Tests")
 class CatalogControllerTests {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private FileStorageService fileStorageService;
 
     private final TestContextManager testContextManager = new TestContextManager(getClass());
 
@@ -86,7 +101,7 @@ class CatalogControllerTests {
         List<Integer> numberList = jsonContext.read("$[*].id", List.class);
         List<Long> returnedIds = numberList.stream()
                 .map(Number::longValue)
-                .collect(Collectors.toList());
+                .toList();
         assertEquals(requestedIds, returnedIds);
     }
 
@@ -156,14 +171,14 @@ class CatalogControllerTests {
 
     @Test
     @DisplayName("Should update item")
-    void shouldUpdateItem() {
+    void shouldUpdateItem() throws IOException {
         CatalogItemDto itemToUpdate = new CatalogItemDto(
                 1L,
                 "Updated Item",
                 "Updated Description",
                 200.0,
-                "updated.jpg",
-                "uri/updated.jpg",
+                null,
+                null,
                 new CatalogTypeDto(2L),
                 new CatalogBrandDto(2L),
                 20,
@@ -171,23 +186,49 @@ class CatalogControllerTests {
                 30,
                 true
         );
-        restTemplate.put("/items", itemToUpdate);
-        ResponseEntity<CatalogItemDto> response = restTemplate.getForEntity("/items/1", CatalogItemDto.class);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertUpdatedItem(response.getBody(), itemToUpdate);
+
+        MockMultipartFile image = new MockMultipartFile("image", "test.jpg", "image/jpg", "test image content".getBytes());
+
+        CatalogItemDto expectedItem = new CatalogItemDto(
+                1L,
+                "Updated Item",
+                "Updated Description",
+                200.0,
+                "test.jpg",
+                "http://testcdndomain.com/test.jpg",
+                new CatalogTypeDto(2L, "Type 2"),
+                new CatalogBrandDto(2L, "Brand 2"),
+                20,
+                10,
+                30,
+                true
+        );
+
+        when(fileStorageService.upload(any(MultipartFile.class))).thenReturn("http://testcdndomain.com/test.jpg");
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("item", itemToUpdate);
+        builder.part("image", image.getResource());
+
+        HttpEntity<MultiValueMap<String, HttpEntity<?>>> requestEntity = new HttpEntity<>(builder.build());
+        ResponseEntity<Void> response = restTemplate.exchange("/items", HttpMethod.PUT, requestEntity, Void.class);
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        ResponseEntity<CatalogItemDto> updatedItemResponse = restTemplate.getForEntity("/items/1", CatalogItemDto.class);
+        assertEquals(HttpStatus.OK, updatedItemResponse.getStatusCode());
+        assertNotNull(updatedItemResponse.getBody());
+        assertUpdatedItem(updatedItemResponse.getBody(), expectedItem);
     }
 
     @Test
     @DisplayName("Should create item")
-    void shouldCreateItem() {
+    void shouldCreateItem() throws IOException {
+        MultipartFile image = createMockMultipartFile("test.jpg");
         CatalogItemDto newItem = new CatalogItemDto(
                 null,
                 "New Item",
                 "New Description",
                 100.0,
-                "new.jpg",
-                "uri/new.jpg",
+                null,
+                null,
                 new CatalogTypeDto(1L, "Type"),
                 new CatalogBrandDto(1L, "Brand"),
                 10,
@@ -195,12 +236,32 @@ class CatalogControllerTests {
                 20,
                 false
         );
-        ResponseEntity<CatalogItemDto> response = restTemplate.postForEntity("/items", newItem, CatalogItemDto.class);
+
+        when(fileStorageService.upload(any(MultipartFile.class))).thenReturn("http://testcdndomain.com/test.jpg");
+
+        // Create a MultipartBodyBuilder to hold the form data
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("item", newItem);
+        builder.part("image", image.getResource());
+
+        HttpEntity<MultiValueMap<String, HttpEntity<?>>> requestEntity = new HttpEntity<>(builder.build());
+        // Send the POST request with the form data
+        ResponseEntity<CatalogItemDto> response = restTemplate.postForEntity("/items", requestEntity, CatalogItemDto.class);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertCreatedItem(response.getBody(), newItem);
     }
 
+    private MultipartFile createMockMultipartFile(String filename) {
+        MultipartFile file = Mockito.mock(MultipartFile.class);
+        Resource fileResource = Mockito.mock(Resource.class);
+        when(file.getResource()).thenReturn(fileResource);
+        when(file.getOriginalFilename()).thenReturn(filename);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getContentType()).thenReturn("image/jpg");
+        when(fileResource.getFilename()).thenReturn(filename);
+        return file;
+    }
 
     @Test
     @DisplayName("Should delete item by ID")

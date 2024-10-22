@@ -8,28 +8,46 @@ import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.TestContextManager;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.trendwa.eshop.catalogservice.TestcontainersConfiguration;
+import org.springframework.web.multipart.MultipartFile;
+import org.trendwa.eshop.catalogservice.AppTestConfiguration;
 import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogTypeDto;
 import org.trendwa.eshop.catalogservice.exception.CatalogItemNotFoundException;
 import org.trendwa.eshop.catalogservice.util.AppTestUtils;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
-@Import(TestcontainersConfiguration.class)
+@Import(AppTestConfiguration.class)
+@TestPropertySource(locations = "classpath:application-test.properties")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 class CatalogServiceTests {
 
     @Autowired
     private CatalogService catalogService;
+
+    @Autowired
+    private FileStorageService fileStorageService;
+
+    @BeforeEach
+    void setUp() throws IOException {
+        when(fileStorageService.upload(any(MultipartFile.class))).thenAnswer(invocation -> {
+            MultipartFile file = invocation.getArgument(0);
+            return "http://testcdndomain.com/" + file.getOriginalFilename();
+        });
+    }
 
     private final TestContextManager testContextManager = new TestContextManager(getClass());
 
@@ -99,43 +117,53 @@ class CatalogServiceTests {
 
     @Test
     @DisplayName("Should add item")
-    void shouldAddItem() {
-        assertNotNull(catalogService.save(generateCatalogItemDto(null)).getId());
+    void shouldAddItem() throws IOException {
+        MultipartFile image = createMockMultipartFile("test.jpg");
+        assertNotNull(catalogService.create(generateCatalogItemDto(null), image).getId());
     }
 
     @Test
     @DisplayName("Should throw exception if item's picture file name is not unique")
-    void shouldThrowExceptionIfItemPictureFileNameIsNotUnique() {
-        CatalogItemDto itemToSave = generateCatalogItemDto(null, "test.jpg", null);
-        catalogService.save(itemToSave);
-        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> catalogService.save(itemToSave));
+    void shouldThrowExceptionIfItemPictureFileNameIsNotUnique() throws IOException {
+        CatalogItemDto itemToSave = generateCatalogItemDto(null);
+        MultipartFile file = createMockMultipartFile("test.jpg");
+
+        catalogService.create(itemToSave, file);
+        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> catalogService.create(itemToSave, file));
         assertEquals(ConstraintViolationException.ConstraintKind.UNIQUE, ((ConstraintViolationException) exception.getCause()).getKind());
     }
 
     @Test
     @DisplayName("Should throw exception if item's picture URI is not unique")
-    void shouldThrowExceptionIfItemPictureUriIsNotUnique() {
-        CatalogItemDto itemToSave = generateCatalogItemDto(null, null, "uri/test.jpg");
-        catalogService.save(itemToSave);
-        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> catalogService.save(itemToSave));
+    void shouldThrowExceptionIfItemPictureUriIsNotUnique() throws IOException {
+        CatalogItemDto itemToSave = generateCatalogItemDto(null);
+        MultipartFile file = createMockMultipartFile("test.jpg");
+
+        catalogService.create(itemToSave, file);
+        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> catalogService.create(itemToSave, file));
         assertEquals(ConstraintViolationException.ConstraintKind.UNIQUE, ((ConstraintViolationException) exception.getCause()).getKind());
     }
 
     @Test
     @DisplayName("Should update item")
-    void shouldUpdateItem() {
-        CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null));
-        CatalogItemDto updatedItem = catalogService.save(generateCatalogItemDto(savedItem.getId(), "test.jpg", null));
-        assertEquals("test.jpg", updatedItem.getPictureFileName());
+    void shouldUpdateItem() throws IOException {
+        CatalogItemDto savedItem = catalogService.create(generateCatalogItemDto(null), null);
+        MultipartFile file = createMockMultipartFile("test.jpg");
+        catalogService.update(generateCatalogItemDto(savedItem.getId()), file);
+        CatalogItemDto updatedItem = catalogService.getItemById(savedItem.getId());
+        assertEquals("http://testcdndomain.com/test.jpg", updatedItem.getPictureUri());
     }
 
     @Test
     @DisplayName("Should throw exception if updated item's picture file name is not unique")
-    void shouldThrowExceptionIfUpdatedItemPictureFileNameIsNotUnique() {
-        CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null, "test.jpg", null));
-        catalogService.save(generateCatalogItemDto(null, "test2.jpg", null));
+    void shouldThrowExceptionIfUpdatedItemPictureFileNameIsNotUnique() throws IOException {
+        MultipartFile image = createMockMultipartFile("test.jpg");
+        MultipartFile image2 = createMockMultipartFile("test2.jpg");
+        CatalogItemDto savedItem = catalogService.create(generateCatalogItemDto(null), image);
+        catalogService.create(generateCatalogItemDto(null), image2);
+
         DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> {
-            catalogService.save(generateCatalogItemDto(savedItem.getId(), "test2.jpg", null));
+            catalogService.update(generateCatalogItemDto(savedItem.getId()), image2);
             catalogService.flush();
         });
         assertEquals(ConstraintViolationException.ConstraintKind.UNIQUE, ((ConstraintViolationException) exception.getCause()).getKind());
@@ -143,11 +171,16 @@ class CatalogServiceTests {
 
     @Test
     @DisplayName("Should throw exception if updated item's picture URI is not unique")
-    void shouldThrowExceptionIfUpdatedItemPictureUriIsNotUnique() {
-        CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null, null, "uri/test.jpg"));
-        catalogService.save(generateCatalogItemDto(null, null, "uri/test2.jpg"));
+    void shouldThrowExceptionIfUpdatedItemPictureUriIsNotUnique() throws IOException {
+
+        MultipartFile testImage1 = createMockMultipartFile("test.jpg");
+        MultipartFile testImage2 = createMockMultipartFile("test2.jpg");
+
+        CatalogItemDto savedItem = catalogService.create(generateCatalogItemDto(null), testImage1);
+        catalogService.create(generateCatalogItemDto(null), testImage2);
+
         DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> {
-            catalogService.save(generateCatalogItemDto(savedItem.getId(), null, "uri/test2.jpg"));
+            catalogService.update(generateCatalogItemDto(savedItem.getId()), testImage2);
             catalogService.flush();
         });
         assertEquals(ConstraintViolationException.ConstraintKind.UNIQUE, ((ConstraintViolationException) exception.getCause()).getKind());
@@ -155,20 +188,20 @@ class CatalogServiceTests {
 
     @Test
     @DisplayName("Should remove item")
-    void shouldRemoveItem() {
-        CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null));
+    void shouldRemoveItem() throws IOException {
+        CatalogItemDto savedItem = catalogService.create(generateCatalogItemDto(null), null);
         catalogService.deleteById(savedItem.getId());
         assertThrows(CatalogItemNotFoundException.class, () -> catalogService.getItemById(savedItem.getId()));
     }
 
-    private CatalogItemDto generateCatalogItemDto(Long id, String pictureFileName, String pictureUri) {
+    private CatalogItemDto generateCatalogItemDto(Long id) {
         return new CatalogItemDto(
                 id,
                 "Test Item",
                 "Test Description",
                 100.0,
-                pictureFileName,
-                pictureUri,
+                null,
+                null,
                 new CatalogTypeDto(1L),
                 new CatalogBrandDto(1L),
                 10,
@@ -177,7 +210,7 @@ class CatalogServiceTests {
                 false);
     }
 
-    private CatalogItemDto generateCatalogItemDto(Long id) {
-        return generateCatalogItemDto(id, null, null);
+    private MultipartFile createMockMultipartFile(String filename) {
+        return new MockMultipartFile("image", filename, "image/jpg", "test image content".getBytes());
     }
 }

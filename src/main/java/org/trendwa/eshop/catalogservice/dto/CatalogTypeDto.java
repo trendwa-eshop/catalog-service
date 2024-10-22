@@ -10,6 +10,7 @@ import org.trendwa.eshop.catalogservice.validation.CatalogTypeValidations.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class CatalogTypeDto {
 
     @Schema(description = "Unique identifier of the catalog type", example = "1")
