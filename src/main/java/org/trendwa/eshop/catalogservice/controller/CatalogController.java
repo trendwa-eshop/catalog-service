@@ -132,7 +132,7 @@ public class CatalogController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<Void> updateItem(@ModelAttribute CatalogItemForm form) throws IOException {
-        catalogService.update(form.toDto(), form.getImage());
+        catalogService.save(form.toDto(), form.getImage());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -148,7 +148,7 @@ public class CatalogController {
     @Transactional
     public ResponseEntity<CatalogItemDto> createItem(
             @ModelAttribute CatalogItemForm form, HttpServletRequest request) throws IOException {
-        CatalogItemDto createdItem = catalogService.create(form.toDto(), form.getImage());
+        CatalogItemDto createdItem = catalogService.save(form.toDto(), form.getImage());
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath(request.getContextPath() + "/items/{id}");
         UriComponents uriComponents = uriBuilder.buildAndExpand(createdItem.getId());
 

@@ -3,11 +3,9 @@ package org.trendwa.eshop.catalogservice.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
@@ -25,6 +23,7 @@ import org.trendwa.eshop.catalogservice.repository.CatalogTypeRepository;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -93,27 +92,31 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     @Override
-    @Transactional
-    public CatalogItemDto create(CatalogItemDto item, MultipartFile productImage) throws DataIntegrityViolationException, IOException {
-
-        if(item.getId() != null) {
-            throw new IllegalArgumentException("Id must be null for new entity");
-        }
-        if (isFileValid(productImage)) {
-            uploadNewFile(item, productImage);
-        }
-        CatalogItem itemToSave = CatalogItemMapper.mapToEntity(item);
-        CatalogItem savedItem = catalogItemRepository.save(itemToSave);
-        catalogItemRepository.refresh(savedItem);
-        return CatalogItemMapper.mapToDto(savedItem);
+    public CatalogItemDto save(CatalogItemDto catalogItem, MultipartFile image) {
+        handleFileUpload(catalogItem, image);
+        CatalogItem item = catalogItemRepository.save(CatalogItemMapper.mapToEntity(catalogItem));
+        return CatalogItemMapper.mapToDto(item);
     }
 
-    @Override
-    @Transactional
-    public void update(CatalogItemDto item, MultipartFile productImage) throws IOException {
-        CatalogItem existingItem = catalogItemRepository.findById(item.getId()).orElseThrow(() -> new CatalogItemNotFoundException(item.getId()));
-        handleFileUpload(item, productImage, existingItem);
-        catalogItemRepository.save(CatalogItemMapper.mapToEntity(item));
+    private void handleFileUpload(CatalogItemDto catalogItem, MultipartFile image) {
+        if (isFileValid(image)) {
+            if (isNewFile(catalogItem, image)) {
+                try {
+                    uploadNewFileAndRefreshItem(catalogItem, image);
+                } catch (IOException e) {
+                    // TODO: use a dedicated exception
+                    throw new RuntimeException("Error uploading file", e);
+                }
+            } else {
+                log.info("Reusing existing file for catalog item with id: {}", catalogItem.getId());
+            }
+        } else {
+            throw new IllegalArgumentException("Product image is not valid");
+        }
+    }
+
+    private boolean isNewFile(CatalogItemDto catalogItem, MultipartFile image) {
+        return !Objects.equals(image.getOriginalFilename(), catalogItem.getPictureFileName());
     }
 
     @Override
@@ -130,32 +133,14 @@ public class CatalogServiceImpl implements CatalogService {
         catalogItemRepository.flush();
     }
 
-    public void handleFileUpload(CatalogItemDto item, MultipartFile file, CatalogItem existingItem) throws IOException {
-        if (isFileValid(file)) {
-            if (isNewFile(existingItem, file)) {
-                uploadNewFile(item, file);
-            } else {
-                reuseExistingFile(item, existingItem);
-            }
-        }
-    }
-
     private boolean isFileValid(MultipartFile file) {
-        return file != null && !file.isEmpty();
+        return file != null && !file.isEmpty() && StringUtils.isNotEmpty(file.getOriginalFilename());
     }
 
-    private boolean isNewFile(CatalogItem existingItem, MultipartFile file) {
-        return existingItem == null || (StringUtils.isNotEmpty(file.getOriginalFilename()) && !file.getOriginalFilename().equals(existingItem.getPictureFileName()));
-    }
-
-    private void uploadNewFile(CatalogItemDto item, MultipartFile file) throws IOException {
+    private void uploadNewFileAndRefreshItem(CatalogItemDto item, MultipartFile file) throws IOException {
         String uploadedFileUrl = fileStorageService.upload(file);
         item.setPictureFileName(file.getOriginalFilename());
         item.setPictureUri(uploadedFileUrl);
     }
 
-    private void reuseExistingFile(CatalogItemDto item, CatalogItem existingItem) {
-        item.setPictureFileName(existingItem.getPictureFileName());
-        item.setPictureUri(existingItem.getPictureUri());
-    }
 }

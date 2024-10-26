@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.TestContextManager;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Propagation;
@@ -27,6 +26,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.trendwa.eshop.catalogservice.util.MockingUtils.createMockMultipartFile;
 
 @SpringBootTest
 @Import(AppTestConfiguration.class)
@@ -119,7 +119,7 @@ class CatalogServiceTests {
     @DisplayName("Should add item")
     void shouldAddItem() throws IOException {
         MultipartFile image = createMockMultipartFile("test.jpg");
-        assertNotNull(catalogService.create(generateCatalogItemDto(null), image).getId());
+        assertNotNull(catalogService.save(generateCatalogItemDto(null), image).getId());
     }
 
     @Test
@@ -128,8 +128,8 @@ class CatalogServiceTests {
         CatalogItemDto itemToSave = generateCatalogItemDto(null);
         MultipartFile file = createMockMultipartFile("test.jpg");
 
-        catalogService.create(itemToSave, file);
-        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> catalogService.create(itemToSave, file));
+        catalogService.save(itemToSave, file);
+        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> catalogService.save(itemToSave, file));
         assertEquals(ConstraintViolationException.ConstraintKind.UNIQUE, ((ConstraintViolationException) exception.getCause()).getKind());
     }
 
@@ -139,17 +139,17 @@ class CatalogServiceTests {
         CatalogItemDto itemToSave = generateCatalogItemDto(null);
         MultipartFile file = createMockMultipartFile("test.jpg");
 
-        catalogService.create(itemToSave, file);
-        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> catalogService.create(itemToSave, file));
+        catalogService.save(itemToSave, file);
+        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> catalogService.save(itemToSave, file));
         assertEquals(ConstraintViolationException.ConstraintKind.UNIQUE, ((ConstraintViolationException) exception.getCause()).getKind());
     }
 
     @Test
     @DisplayName("Should update item")
     void shouldUpdateItem() throws IOException {
-        CatalogItemDto savedItem = catalogService.create(generateCatalogItemDto(null), null);
+        CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null), createMockMultipartFile("some.jpg"));
         MultipartFile file = createMockMultipartFile("test.jpg");
-        catalogService.update(generateCatalogItemDto(savedItem.getId()), file);
+        catalogService.save(generateCatalogItemDto(savedItem.getId()), file);
         CatalogItemDto updatedItem = catalogService.getItemById(savedItem.getId());
         assertEquals("http://testcdndomain.com/test.jpg", updatedItem.getPictureUri());
     }
@@ -159,11 +159,11 @@ class CatalogServiceTests {
     void shouldThrowExceptionIfUpdatedItemPictureFileNameIsNotUnique() throws IOException {
         MultipartFile image = createMockMultipartFile("test.jpg");
         MultipartFile image2 = createMockMultipartFile("test2.jpg");
-        CatalogItemDto savedItem = catalogService.create(generateCatalogItemDto(null), image);
-        catalogService.create(generateCatalogItemDto(null), image2);
+        CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null), image);
+        catalogService.save(generateCatalogItemDto(null), image2);
 
         DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> {
-            catalogService.update(generateCatalogItemDto(savedItem.getId()), image2);
+            catalogService.save(generateCatalogItemDto(savedItem.getId()), image2);
             catalogService.flush();
         });
         assertEquals(ConstraintViolationException.ConstraintKind.UNIQUE, ((ConstraintViolationException) exception.getCause()).getKind());
@@ -176,11 +176,11 @@ class CatalogServiceTests {
         MultipartFile testImage1 = createMockMultipartFile("test.jpg");
         MultipartFile testImage2 = createMockMultipartFile("test2.jpg");
 
-        CatalogItemDto savedItem = catalogService.create(generateCatalogItemDto(null), testImage1);
-        catalogService.create(generateCatalogItemDto(null), testImage2);
+        CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null), testImage1);
+        catalogService.save(generateCatalogItemDto(null), testImage2);
 
         DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> {
-            catalogService.update(generateCatalogItemDto(savedItem.getId()), testImage2);
+            catalogService.save(generateCatalogItemDto(savedItem.getId()), testImage2);
             catalogService.flush();
         });
         assertEquals(ConstraintViolationException.ConstraintKind.UNIQUE, ((ConstraintViolationException) exception.getCause()).getKind());
@@ -189,7 +189,7 @@ class CatalogServiceTests {
     @Test
     @DisplayName("Should remove item")
     void shouldRemoveItem() throws IOException {
-        CatalogItemDto savedItem = catalogService.create(generateCatalogItemDto(null), null);
+        CatalogItemDto savedItem = catalogService.save(generateCatalogItemDto(null), createMockMultipartFile("test.jpg"));
         catalogService.deleteById(savedItem.getId());
         assertThrows(CatalogItemNotFoundException.class, () -> catalogService.getItemById(savedItem.getId()));
     }
@@ -210,7 +210,5 @@ class CatalogServiceTests {
                 false);
     }
 
-    private MultipartFile createMockMultipartFile(String filename) {
-        return new MockMultipartFile("image", filename, "image/jpg", "test image content".getBytes());
-    }
+
 }
