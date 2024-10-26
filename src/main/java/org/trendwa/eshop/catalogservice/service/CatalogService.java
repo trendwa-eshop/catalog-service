@@ -92,22 +92,12 @@ public interface CatalogService {
     List<CatalogItemDto> getItemsByBrandAndType(String brand, String type, Pageable pageable);
 
     /**
-     * Creates a new catalog item.
+     * Saves the given catalog item.
      *
-     * @param item         the catalog item to create
-     * @param productImage the product image to upload
-     * @return the created catalog item
+     * @param catalogItem the catalog item to save
+     * @return the saved catalog item
      */
-    CatalogItemDto create(CatalogItemDto item, MultipartFile productImage) throws IOException;
-
-    /**
-     * Updates an existing catalog item.
-     *
-     * @param item         the catalog item to update
-     * @param productImage the product image to upload
-     * @throws IOException if an I/O error occurs during file upload
-     */
-    void update(CatalogItemDto item, MultipartFile productImage) throws IOException;
+    CatalogItemDto save(CatalogItemDto catalogItem, MultipartFile productImage) throws IOException;
 
     /**
      * Deletes a catalog item by its ID.
