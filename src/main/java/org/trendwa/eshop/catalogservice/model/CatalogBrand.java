@@ -3,16 +3,15 @@ package org.trendwa.eshop.catalogservice.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "catalog_brand")
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter @Setter
 public class CatalogBrand extends ApplicationEntity{
 
     public CatalogBrand(Long id) {

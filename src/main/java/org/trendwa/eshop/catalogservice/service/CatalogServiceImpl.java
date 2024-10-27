@@ -100,9 +100,9 @@ public class CatalogServiceImpl implements CatalogService {
 
     private void handleFileUpload(CatalogItemDto catalogItem, MultipartFile image) {
         if (isFileValid(image)) {
-            if (isNewFile(catalogItem, image)) {
+            if (isNewImage(catalogItem, image)) {
                 try {
-                    uploadNewFileAndRefreshItem(catalogItem, image);
+                    uploadNewProductImageAndRefreshItem(catalogItem, image);
                 } catch (IOException e) {
                     // TODO: use a dedicated exception
                     throw new RuntimeException("Error uploading file", e);
@@ -115,7 +115,7 @@ public class CatalogServiceImpl implements CatalogService {
         }
     }
 
-    private boolean isNewFile(CatalogItemDto catalogItem, MultipartFile image) {
+    private boolean isNewImage(CatalogItemDto catalogItem, MultipartFile image) {
         return !Objects.equals(image.getOriginalFilename(), catalogItem.getPictureFileName());
     }
 
@@ -137,7 +137,7 @@ public class CatalogServiceImpl implements CatalogService {
         return file != null && !file.isEmpty() && StringUtils.isNotEmpty(file.getOriginalFilename());
     }
 
-    private void uploadNewFileAndRefreshItem(CatalogItemDto item, MultipartFile file) throws IOException {
+    private void uploadNewProductImageAndRefreshItem(CatalogItemDto item, MultipartFile file) throws IOException {
         String uploadedFileUrl = fileStorageService.upload(file);
         item.setPictureFileName(file.getOriginalFilename());
         item.setPictureUri(uploadedFileUrl);

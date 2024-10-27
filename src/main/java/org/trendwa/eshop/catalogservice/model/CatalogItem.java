@@ -1,18 +1,17 @@
 package org.trendwa.eshop.catalogservice.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.trendwa.eshop.catalogservice.exception.domain.CatalogDomainException;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
-@Data
 @NoArgsConstructor
 @Table(name = "catalog_item", indexes = {
         @Index(name = "idx_catalog_items_name", columnList = "name"),
 })
+@Getter @Setter
 public class CatalogItem extends ApplicationEntity {
 
     @Column(nullable = false, name = "name")
