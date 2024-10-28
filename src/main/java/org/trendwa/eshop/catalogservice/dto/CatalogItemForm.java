@@ -13,7 +13,7 @@ import java.io.IOException;
 @Schema(description = "Form for creating or updating a catalog item")
 public class CatalogItemForm {
 
-    @Schema(description = "JSON representation of the catalog item", implementation = CatalogItemDto.class)
+    @Schema(description = "JSON representation of the catalog item", type = "CatalogItemDto", implementation = CatalogItemDto.class)
     private String item;
 
     @Schema(description = "Image file for the catalog item")
