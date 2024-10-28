@@ -36,10 +36,10 @@ public class CatalogItemDto {
     @Schema(description = "URI of the catalog item's picture")
     private String pictureUri;
 
-    @Schema(description = "Type of the catalog item", example = "1")
+    @Schema(description = "Type of the catalog item")
     private CatalogTypeDto catalogType;
 
-    @Schema(description = "Brand of the catalog item", example = "1")
+    @Schema(description = "Brand of the catalog item")
     private CatalogBrandDto catalogBrand;
 
     @Stock
