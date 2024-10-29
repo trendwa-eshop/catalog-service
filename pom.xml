@@ -130,6 +130,7 @@
             <artifactId>aws-crt</artifactId>
             <version>0.31.3</version>
         </dependency>
+
     </dependencies>
 
     <build>

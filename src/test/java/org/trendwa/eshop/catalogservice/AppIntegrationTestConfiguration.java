@@ -1,26 +1,21 @@
 package org.trendwa.eshop.catalogservice;
 
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
-import org.trendwa.eshop.catalogservice.service.ImageStorageService;
 
 import java.util.List;
 
 @TestConfiguration(proxyBeanMethods = false)
 @TestPropertySource(locations = "classpath:application-test.properties")
-public class AppTestConfiguration {
+public class AppIntegrationTestConfiguration {
 
     @Container
     private static final MySQLContainer<?> MYSQL_CONTAINER;
-
-    @MockBean
-    private ImageStorageService imageStorageService;
 
     static {
         MYSQL_CONTAINER = new MySQLContainer<>(DockerImageName.parse("mysql:9.0.1"))

@@ -24,7 +24,7 @@ import org.trendwa.eshop.catalogservice.AppTestConfiguration;
 import org.trendwa.eshop.catalogservice.dto.CatalogBrandDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogItemDto;
 import org.trendwa.eshop.catalogservice.dto.CatalogTypeDto;
-import org.trendwa.eshop.catalogservice.service.FileStorageService;
+import org.trendwa.eshop.catalogservice.service.ImageStorageService;
 import org.trendwa.eshop.catalogservice.util.AppTestUtils;
 
 import java.io.IOException;
@@ -48,7 +48,7 @@ class CatalogControllerTests {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private FileStorageService fileStorageService;
+    private ImageStorageService imageStorageService;
 
     private final TestContextManager testContextManager = new TestContextManager(getClass());
 
@@ -203,7 +203,7 @@ class CatalogControllerTests {
                 true
         );
 
-        when(fileStorageService.upload(any(MultipartFile.class))).thenReturn("http://testcdndomain.com/test.jpg");
+        when(imageStorageService.upload(any(MultipartFile.class))).thenReturn("http://testcdndomain.com/test.jpg");
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         builder.part("item", itemToUpdate);
         builder.part("image", image.getResource());
@@ -250,7 +250,7 @@ class CatalogControllerTests {
                 false
         );
 
-        when(fileStorageService.upload(any(MultipartFile.class))).thenReturn("http://testcdndomain.com/test.jpg");
+        when(imageStorageService.upload(any(MultipartFile.class))).thenReturn("http://testcdndomain.com/test.jpg");
 
         MultipartFile image = createMockMultipartFile("test.jpg");
 
