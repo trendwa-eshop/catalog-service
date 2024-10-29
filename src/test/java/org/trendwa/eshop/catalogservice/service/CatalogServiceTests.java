@@ -39,11 +39,11 @@ class CatalogServiceTests {
     private CatalogService catalogService;
 
     @Autowired
-    private FileStorageService fileStorageService;
+    private ImageStorageService imageStorageService;
 
     @BeforeEach
     void setUp() throws IOException {
-        when(fileStorageService.upload(any(MultipartFile.class))).thenAnswer(invocation -> {
+        when(imageStorageService.upload(any(MultipartFile.class))).thenAnswer(invocation -> {
             MultipartFile file = invocation.getArgument(0);
             return "http://testcdndomain.com/" + file.getOriginalFilename();
         });

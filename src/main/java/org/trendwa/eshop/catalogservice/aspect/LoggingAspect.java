@@ -25,6 +25,6 @@ public class LoggingAspect {
 
     @AfterThrowing(pointcut = "execution(* org.trendwa.eshop.catalogservice.controller.*.*(..)) || execution(* org.trendwa.eshop.catalogservice.service.*.*(..))", throwing = "error")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable error) {
-        log.error("Exception in method: {} with cause: {}", joinPoint.getSignature().toShortString(), error.getCause() != null ? error.getCause() : "NULL");
+        log.error("Exception in method: {} with cause: {}", joinPoint.getSignature().toShortString(), error.getMessage());
     }
 }

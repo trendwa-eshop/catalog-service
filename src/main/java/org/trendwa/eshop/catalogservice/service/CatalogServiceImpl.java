@@ -33,7 +33,7 @@ public class CatalogServiceImpl implements CatalogService {
     private final CatalogItemRepository catalogItemRepository;
     private final CatalogBrandRepository catalogBrandRepository;
     private final CatalogTypeRepository catalogTypeRepository;
-    private final FileStorageService fileStorageService;
+    private final ImageStorageService imageStorageService;
 
     @Override
     public List<CatalogBrandDto> getBrands(Pageable pageable) {
@@ -138,7 +138,7 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     private void uploadNewProductImageAndRefreshItem(CatalogItemDto item, MultipartFile file) throws IOException {
-        String uploadedFileUrl = fileStorageService.upload(file);
+        String uploadedFileUrl = imageStorageService.upload(file);
         item.setPictureFileName(file.getOriginalFilename());
         item.setPictureUri(uploadedFileUrl);
     }
